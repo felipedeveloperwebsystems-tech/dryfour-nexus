@@ -1,0 +1,34 @@
+# ============================================================
+# DRYFOUR NEXUS — .gitignore
+# ============================================================
+
+# Variáveis de ambiente — NUNCA commitar!
+.env
+.env.local
+.env.production
+
+# Binários Go
+dryfour-nexus
+dryfour-nexus.exe
+*.exe
+*.out
+
+# Go build cache
+vendor/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Logs
+*.log
+logs/
+
+# Node (se usar ferramentas de build)
+node_modules/
