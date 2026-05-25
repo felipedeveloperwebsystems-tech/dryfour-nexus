@@ -1,34 +1,43 @@
 # ============================================================
-# DRYFOUR NEXUS — .gitignore
+# DRYFOUR NEXUS — .gitignore  (Vercel-ready)
 # ============================================================
 
-# Variáveis de ambiente — NUNCA commitar!
+# ── Variáveis de ambiente — NUNCA commitar com valores reais ──
 .env
 .env.local
 .env.production
+.env.*.local
 
-# Binários Go
-dryfour-nexus
-dryfour-nexus.exe
+# ── Vercel CLI ──
+.vercel/
+
+# ── Binários Go ──
 *.exe
-*.out
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
+nexus
+nexus.exe
 
-# Go build cache
-vendor/
+# ── Go test cache ──
+*.test
+*.prof
+/tmp/
 
-# IDEs
+# ── Editores ──
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# macOS
+# ── OS ──
 .DS_Store
-.AppleDouble
+Thumbs.db
+desktop.ini
 
-# Logs
+# ── Logs ──
 *.log
-logs/
-
-# Node (se usar ferramentas de build)
-node_modules/
