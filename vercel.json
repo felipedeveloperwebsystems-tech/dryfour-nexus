@@ -1,33 +1,7 @@
 {
-  "//": [
-    "============================================================",
-    "DRYFOUR NEXUS — vercel.json",
-    "Vercel Hobby Plan — Serverless Go + Static Frontend",
-    "============================================================",
-    "",
-    "ARQUITETURA:",
-    "  /api/* → api/index.go  (Serverless Function, Go runtime)",
-    "  /*      → public/      (CDN global estático — index.html + assets)",
-    "",
-    "FLUXO DE ROTA (ordem importa):",
-    "  1. /api/health, /api/news, /api/categories → serverless",
-    "  2. /assets/* → CDN estático",
-    "  3. /* → SPA fallback → public/index.html",
-    "",
-    "PLANO HOBBY FREE:",
-    "  - 100 GB bandwidth/mês",
-    "  - 100 serverless function executions/dia (suficiente para dev/blog)",
-    "  - Cold start Go: ~200-400ms (aceitável para um blog)",
-    "  - Neon PostgreSQL funciona em modo serverless nativo",
-    "============================================================"
-  ],
-
   "version": 2,
-
   "framework": null,
-
   "buildCommand": "go build ./...",
-
   "functions": {
     "api/index.go": {
       "runtime": "vercel-community/go@1.0.0",
@@ -35,10 +9,8 @@
       "memory": 256
     }
   },
-
   "routes": [
     {
-      "//": "CORS preflight — responde OPTIONS em qualquer rota /api/",
       "src": "^/api/(.*)",
       "methods": ["OPTIONS"],
       "headers": {
@@ -50,62 +22,36 @@
       "status": 204
     },
     {
-      "//": "API — todas as sub-rotas passam pela função serverless",
       "src": "^/api/(.*)",
       "dest": "/api/index.go"
     },
     {
-      "//": "Assets estáticos — CSS, JS, fontes, imagens (com cache longo)",
       "src": "^/assets/(.*)",
-      "dest": "/public/assets/$1",
-      "headers": {
-        "Cache-Control": "public, max-age=86400, stale-while-revalidate=3600"
-      }
+      "dest": "/public/assets/$1"
     },
     {
-      "//": "SPA fallback — qualquer rota não-API serve o index.html",
       "src": "^/((?!api/).*)",
       "dest": "/public/index.html"
     }
   ],
-
   "headers": [
     {
-      "//": "Cabeçalhos de segurança globais aplicados em todas as respostas",
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
+        { "key": "X-Content-Type-Options",  "value": "nosniff" },
+        { "key": "X-Frame-Options",          "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection",         "value": "1; mode=block" },
+        { "key": "Referrer-Policy",          "value": "strict-origin-when-cross-origin" }
       ]
     },
     {
-      "//": "Cache longo para assets estáticos (CSS, JS, imagens)",
       "source": "/assets/(.*)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=3600"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=3600" }
       ]
     }
   ],
-
   "env": {
-    "//": "Variáveis de build — valores reais configurados via 'vercel env add'",
     "GO_ENV": "production"
   }
 }
