@@ -33,7 +33,7 @@
   <!--
     CSS CRÍTICO INLINE — previne FOUC (Flash of Unstyled Content).
     Light-Tech / White Sci-Fi: fundo cerâmico imediato antes do style.css carregar.
-    Nunca duplicar regras do style.css — apenas as propriedades visuais críticas.
+    CORREÇÃO v2.1: min-height do skeleton compatível com nova estrutura de grid.
   -->
   <style>
     html, body {
@@ -41,7 +41,10 @@
       color: #0F172A;
       margin: 0; padding: 0;
       font-family: system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
     }
+    /* Sidebar oculto antes do CSS carregar — evita flash de conteúdo desposicionado */
+    .nexus-sidebar { transform: translateX(-105%); }
     .nx-skeleton {
       background: linear-gradient(90deg, #e8edf5 25%, #f0f4fa 50%, #e8edf5 75%);
       background-size: 200% 100%;
@@ -53,9 +56,12 @@
       0%   { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    /* CORREÇÃO: sniche-subnav fechado por padrão mesmo sem CSS externo */
+    .sniche-subnav { display: grid; grid-template-rows: 0fr; overflow: hidden; }
+    .sniche-subnav > * { overflow: hidden; }
   </style>
 
-  <!-- Fontes: Bebas Neue (display/headlines) | DM Sans (body) | IBM Plex Mono (data/code) -->
+  <!-- Fontes: Bebas Neue | DM Sans | IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -68,31 +74,46 @@
 <a class="skip-link" href="#mainContent">Ir para o conteúdo principal</a>
 
 <!-- ===== SIDEBAR OVERLAY ===== -->
-<!-- Clicável: fecha o sidebar ao tocar fora — acessibilidade e mobile UX -->
+<!--
+  Cobre o restante da viewport quando o sidebar está aberto.
+  JS adiciona .active → opacity:1 + pointer-events:all.
+  Clicar aqui fecha o sidebar (SidebarModule.close()).
+-->
 <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
 <!-- ===== NEXUS SIDEBAR DRAWER ===== -->
 <!--
-  Sidebar vertical deslizante — espelha o sistema de CategorySidebar do Dryfour Shopping.
-  Traduz fora da viewport (translateX(-105%)) e desliza para dentro (translateX(0)).
-  Acessível: role="navigation", aria-modal, aria-label, focus-trap via JS.
+  CORREÇÃO v2.1:
+  - will-change:transform no CSS → GPU layer dedicada para backdrop-filter (60 FPS)
+  - .sniche-subnav usa grid-template-rows:0fr→1fr → accordion animado sem layout thrashing
+  - overscroll-behavior:contain no .sidebar-nav → rolar dentro não propaga ao body
+  - Estrutura do .sidebar-store-link: div wrapper com min-width:0 → textos longos não vazam
 -->
-<aside class="nexus-sidebar" id="nexusSidebar" role="navigation" aria-modal="true" aria-label="Menu de nichos e categorias" aria-hidden="true">
+<aside
+  class="nexus-sidebar"
+  id="nexusSidebar"
+  role="navigation"
+  aria-modal="true"
+  aria-label="Menu de nichos e categorias"
+  aria-hidden="true"
+>
 
-  <!-- Cabeçalho do sidebar -->
+  <!-- ── Cabeçalho ── -->
   <div class="sidebar-head">
     <div class="sidebar-brand">
       <span class="sidebar-logo">DRY<span>FOUR</span> <span class="sidebar-logo-nexus">NEXUS</span></span>
       <span class="sidebar-tagline">Portal Sci-Fi</span>
     </div>
+    <!-- CORREÇÃO v2.1: border-radius:50% + rotate(90deg) no hover (padrão loja) -->
     <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Fechar menu">
       <i class="fas fa-xmark" aria-hidden="true"></i>
     </button>
   </div>
 
-  <!-- Search dentro do sidebar -->
+  <!-- ── Search ── -->
   <div class="sidebar-search-box">
     <i class="fas fa-magnifying-glass sidebar-search-icon" aria-hidden="true"></i>
+    <!-- CORREÇÃO v2.1: min-width:0 no input via CSS previne overflow horizontal -->
     <input
       type="search"
       class="sidebar-search-input"
@@ -106,170 +127,207 @@
     </button>
   </div>
 
-  <!-- Filtro de ordenação -->
+  <!-- ── Sort widget ── -->
   <div class="sidebar-sort-widget">
-    <span class="sidebar-sort-label"><i class="fas fa-sliders"></i> Ordenar por</span>
+    <span class="sidebar-sort-label"><i class="fas fa-sliders" aria-hidden="true"></i> Ordenar por</span>
     <div class="sidebar-sort-pills" role="group" aria-label="Modo de ordenação">
       <button class="sort-pill active" data-sort="recent" aria-pressed="true">
-        <i class="fas fa-clock"></i> Recentes
+        <i class="fas fa-clock" aria-hidden="true"></i> Recentes
       </button>
       <button class="sort-pill" data-sort="popular" aria-pressed="false">
-        <i class="fas fa-fire"></i> Popular
+        <i class="fas fa-fire" aria-hidden="true"></i> Popular
       </button>
       <button class="sort-pill" data-sort="oldest" aria-pressed="false">
-        <i class="fas fa-arrow-up-a-z"></i> Antigos
+        <i class="fas fa-arrow-up-a-z" aria-hidden="true"></i> Antigos
       </button>
     </div>
   </div>
 
-  <!-- Diretório de nichos — accordion multinível -->
+  <!-- ── Diretório de nichos — accordion multinível ── -->
+  <!--
+    ESTRUTURA OBRIGATÓRIA para o accordion v2.1:
+    .sniche-item[data-niche]
+      button.sniche-header[aria-expanded="false"][aria-controls="sub-{niche}"]
+        .sniche-icon-wrap.niche-{niche}-bg > i.fas
+        .sniche-label
+        i.sniche-arrow
+      ul.sniche-subnav#sub-{niche}[role="list"]   ← usa grid-template-rows no CSS
+        li > li + wrapper > a.sub-link             ← CORREÇÃO: li > div (inner wrapper)
+          i.fas + texto
+
+    O CSS v2.1 define:
+      .sniche-subnav          { display:grid; grid-template-rows:0fr; overflow:hidden }
+      .sniche-subnav > *      { overflow:hidden; display:flex; flex-direction:column }
+      .sniche-subnav.open     { grid-template-rows:1fr }
+    JS apenas adiciona/remove a classe .open — nenhuma manipulação de display.
+  -->
   <nav class="sidebar-nav" aria-label="Diretório de categorias">
-    <div class="sidebar-nav-label">NICHOS & CATEGORIAS</div>
+    <div class="sidebar-nav-label">NICHOS &amp; CATEGORIAS</div>
 
-    <!--
-      Estrutura de cada item de nicho:
-      .sniche-item > .sniche-header (clicável) + .sniche-subnav (accordion)
-      data-niche: chave do NexusState
-    -->
-
-    <!-- 1. GLOBAL -->
+    <!-- 1. GLOBAL / FRONT PAGE -->
     <div class="sniche-item" data-niche="default">
       <button class="sniche-header active-sniche" aria-expanded="false" aria-controls="sub-default">
-        <span class="sniche-icon-wrap niche-default-bg"><i class="fas fa-border-all"></i></span>
+        <span class="sniche-icon-wrap niche-default-bg"><i class="fas fa-border-all" aria-hidden="true"></i></span>
         <span class="sniche-label">Página Inicial</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
+      <!-- Inner wrapper obrigatório para o grid-template-rows trick -->
       <ul class="sniche-subnav" id="sub-default" role="list">
-        <li><a href="#" class="sub-link" data-niche="default" data-filter="featured"><i class="fas fa-star"></i> Destaques</a></li>
-        <li><a href="#" class="sub-link" data-niche="default" data-filter="trending"><i class="fas fa-chart-line"></i> Tendências</a></li>
-        <li><a href="#" class="sub-link" data-niche="default" data-filter="all"><i class="fas fa-rss"></i> Feed Global</a></li>
+        <div><!-- inner wrapper — overflow:hidden aplicado aqui pelo CSS -->
+          <li><a href="#" class="sub-link" data-niche="default" data-filter="featured"><i class="fas fa-star" aria-hidden="true"></i> Destaques</a></li>
+          <li><a href="#" class="sub-link" data-niche="default" data-filter="trending"><i class="fas fa-chart-line" aria-hidden="true"></i> Tendências</a></li>
+          <li><a href="#" class="sub-link" data-niche="default" data-filter="all"><i class="fas fa-rss" aria-hidden="true"></i> Feed Global</a></li>
+        </div>
       </ul>
     </div>
 
     <!-- 2. IA & SOFTWARE -->
     <div class="sniche-item" data-niche="ai">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-ai">
-        <span class="sniche-icon-wrap niche-ai-bg"><i class="fas fa-brain"></i></span>
-        <span class="sniche-label">Inteligência & Software</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-ai-bg"><i class="fas fa-brain" aria-hidden="true"></i></span>
+        <span class="sniche-label">Inteligência &amp; Software</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-ai" role="list">
-        <li><a href="#" class="sub-link" data-niche="ai" data-filter="llm"><i class="fas fa-robot"></i> Modelos LLM</a></li>
-        <li><a href="#" class="sub-link" data-niche="ai" data-filter="deeplearning"><i class="fas fa-network-wired"></i> Deep Learning</a></li>
-        <li><a href="#" class="sub-link" data-niche="ai" data-filter="devtools"><i class="fas fa-code"></i> Dev Tools & IDEs</a></li>
-        <li><a href="#" class="sub-link" data-niche="ai" data-filter="courses"><i class="fas fa-graduation-cap"></i> Cursos & Info-produtos</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="ai" data-filter="llm"><i class="fas fa-robot" aria-hidden="true"></i> Modelos LLM</a></li>
+          <li><a href="#" class="sub-link" data-niche="ai" data-filter="deeplearning"><i class="fas fa-network-wired" aria-hidden="true"></i> Deep Learning</a></li>
+          <li><a href="#" class="sub-link" data-niche="ai" data-filter="devtools"><i class="fas fa-code" aria-hidden="true"></i> Dev Tools &amp; IDEs</a></li>
+          <li><a href="#" class="sub-link" data-niche="ai" data-filter="courses"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Cursos &amp; Info-produtos</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 3. SMART HOME -->
+    <!-- 3. SMART HOME & DOMÓTICA -->
     <div class="sniche-item" data-niche="smarthome">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-smarthome">
-        <span class="sniche-icon-wrap niche-smarthome-bg"><i class="fas fa-house-signal"></i></span>
-        <span class="sniche-label">Smart Home & Domótica</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-smarthome-bg"><i class="fas fa-house-signal" aria-hidden="true"></i></span>
+        <span class="sniche-label">Smart Home &amp; Domótica</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-smarthome" role="list">
-        <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="iot"><i class="fas fa-wifi"></i> Dispositivos IoT</a></li>
-        <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="security"><i class="fas fa-shield-alt"></i> Segurança Residencial</a></li>
-        <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="lighting"><i class="fas fa-lightbulb"></i> Iluminação Inteligente</a></li>
-        <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="protocols"><i class="fas fa-plug"></i> Protocolos & Matter</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="iot"><i class="fas fa-wifi" aria-hidden="true"></i> Dispositivos IoT</a></li>
+          <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="security"><i class="fas fa-shield-alt" aria-hidden="true"></i> Segurança Residencial</a></li>
+          <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="lighting"><i class="fas fa-lightbulb" aria-hidden="true"></i> Iluminação Inteligente</a></li>
+          <li><a href="#" class="sub-link" data-niche="smarthome" data-filter="protocols"><i class="fas fa-plug" aria-hidden="true"></i> Protocolos &amp; Matter</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 4. ARQUITETURA -->
+    <!-- 4. ARQUITETURA & ENGENHARIA -->
     <div class="sniche-item" data-niche="architecture">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-architecture">
-        <span class="sniche-icon-wrap niche-architecture-bg"><i class="fas fa-building"></i></span>
-        <span class="sniche-label">Arquitetura & Engenharia</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-architecture-bg"><i class="fas fa-building" aria-hidden="true"></i></span>
+        <span class="sniche-label">Arquitetura &amp; Engenharia</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-architecture" role="list">
-        <li><a href="#" class="sub-link" data-niche="architecture" data-filter="drywall"><i class="fas fa-layer-group"></i> Drywall 3.0</a></li>
-        <li><a href="#" class="sub-link" data-niche="architecture" data-filter="steelframe"><i class="fas fa-cubes"></i> Steel Frame</a></li>
-        <li><a href="#" class="sub-link" data-niche="architecture" data-filter="ar"><i class="fas fa-vr-cardboard"></i> AR & BIM Digital</a></li>
-        <li><a href="#" class="sub-link" data-niche="architecture" data-filter="sustainability"><i class="fas fa-leaf"></i> Tech Sustentável</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="architecture" data-filter="drywall"><i class="fas fa-layer-group" aria-hidden="true"></i> Drywall 3.0</a></li>
+          <li><a href="#" class="sub-link" data-niche="architecture" data-filter="steelframe"><i class="fas fa-cubes" aria-hidden="true"></i> Steel Frame</a></li>
+          <li><a href="#" class="sub-link" data-niche="architecture" data-filter="ar"><i class="fas fa-vr-cardboard" aria-hidden="true"></i> AR &amp; BIM Digital</a></li>
+          <li><a href="#" class="sub-link" data-niche="architecture" data-filter="sustainability"><i class="fas fa-leaf" aria-hidden="true"></i> Tech Sustentável</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 5. HARDWARE EXTREMO -->
+    <!-- 5. HARDWARE EXTREMO & QUANTUM -->
     <div class="sniche-item" data-niche="hardware">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-hardware">
-        <span class="sniche-icon-wrap niche-hardware-bg"><i class="fas fa-microchip"></i></span>
-        <span class="sniche-label">Hardware Extremo & Quantum</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-hardware-bg"><i class="fas fa-microchip" aria-hidden="true"></i></span>
+        <span class="sniche-label">Hardware Extremo &amp; Quantum</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-hardware" role="list">
-        <li><a href="#" class="sub-link" data-niche="hardware" data-filter="gpu"><i class="fas fa-tv"></i> GPUs de Última Geração</a></li>
-        <li><a href="#" class="sub-link" data-niche="hardware" data-filter="cpu"><i class="fas fa-server"></i> Processadores</a></li>
-        <li><a href="#" class="sub-link" data-niche="hardware" data-filter="overclock"><i class="fas fa-bolt"></i> Overclocking</a></li>
-        <li><a href="#" class="sub-link" data-niche="hardware" data-filter="quantum"><i class="fas fa-atom"></i> Computação Quântica</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="hardware" data-filter="gpu"><i class="fas fa-tv" aria-hidden="true"></i> GPUs de Última Geração</a></li>
+          <li><a href="#" class="sub-link" data-niche="hardware" data-filter="cpu"><i class="fas fa-server" aria-hidden="true"></i> Processadores</a></li>
+          <li><a href="#" class="sub-link" data-niche="hardware" data-filter="overclock"><i class="fas fa-bolt" aria-hidden="true"></i> Overclocking</a></li>
+          <li><a href="#" class="sub-link" data-niche="hardware" data-filter="quantum"><i class="fas fa-atom" aria-hidden="true"></i> Computação Quântica</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 6. ESPAÇO & CIÊNCIA -->
+    <!-- 6. ESPAÇO & CIÊNCIA PROFUNDA -->
     <div class="sniche-item" data-niche="space">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-space">
-        <span class="sniche-icon-wrap niche-space-bg"><i class="fas fa-satellite"></i></span>
-        <span class="sniche-label">Espaço & Ciência Profunda</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-space-bg"><i class="fas fa-satellite" aria-hidden="true"></i></span>
+        <span class="sniche-label">Espaço &amp; Ciência Profunda</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-space" role="list">
-        <li><a href="#" class="sub-link" data-niche="space" data-filter="aerospace"><i class="fas fa-rocket"></i> Aeroespacial</a></li>
-        <li><a href="#" class="sub-link" data-niche="space" data-filter="astronomy"><i class="fas fa-star"></i> Astronomia</a></li>
-        <li><a href="#" class="sub-link" data-niche="space" data-filter="bioengineering"><i class="fas fa-dna"></i> Bioengenharia</a></li>
-        <li><a href="#" class="sub-link" data-niche="space" data-filter="terraforming"><i class="fas fa-globe"></i> Terraformação</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="space" data-filter="aerospace"><i class="fas fa-rocket" aria-hidden="true"></i> Aeroespacial</a></li>
+          <li><a href="#" class="sub-link" data-niche="space" data-filter="astronomy"><i class="fas fa-star" aria-hidden="true"></i> Astronomia</a></li>
+          <li><a href="#" class="sub-link" data-niche="space" data-filter="bioengineering"><i class="fas fa-dna" aria-hidden="true"></i> Bioengenharia</a></li>
+          <li><a href="#" class="sub-link" data-niche="space" data-filter="terraforming"><i class="fas fa-globe" aria-hidden="true"></i> Terraformação</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 7. CULTURA SCI-FI -->
+    <!-- 7. CULTURA SCI-FI & FUTURISMO -->
     <div class="sniche-item" data-niche="culture">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-culture">
-        <span class="sniche-icon-wrap niche-culture-bg"><i class="fas fa-infinity"></i></span>
-        <span class="sniche-label">Cultura Sci-Fi & Futurismo</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <span class="sniche-icon-wrap niche-culture-bg"><i class="fas fa-infinity" aria-hidden="true"></i></span>
+        <span class="sniche-label">Cultura Sci-Fi &amp; Futurismo</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-culture" role="list">
-        <li><a href="#" class="sub-link" data-niche="culture" data-filter="cyberpunk"><i class="fas fa-eye"></i> Cyberpunk Aesthetics</a></li>
-        <li><a href="#" class="sub-link" data-niche="culture" data-filter="gaming"><i class="fas fa-gamepad"></i> Sci-Fi Gaming</a></li>
-        <li><a href="#" class="sub-link" data-niche="culture" data-filter="futurism"><i class="fas fa-compass"></i> Filosofia Futurista</a></li>
-        <li><a href="#" class="sub-link" data-niche="culture" data-filter="trends"><i class="fas fa-chart-bar"></i> Tendências & Cultura</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="culture" data-filter="cyberpunk"><i class="fas fa-eye" aria-hidden="true"></i> Cyberpunk Aesthetics</a></li>
+          <li><a href="#" class="sub-link" data-niche="culture" data-filter="gaming"><i class="fas fa-gamepad" aria-hidden="true"></i> Sci-Fi Gaming</a></li>
+          <li><a href="#" class="sub-link" data-niche="culture" data-filter="futurism"><i class="fas fa-compass" aria-hidden="true"></i> Filosofia Futurista</a></li>
+          <li><a href="#" class="sub-link" data-niche="culture" data-filter="trends"><i class="fas fa-chart-bar" aria-hidden="true"></i> Tendências &amp; Cultura</a></li>
+        </div>
       </ul>
     </div>
 
-    <!-- 8. SANDBOX -->
+    <!-- 8. SANDBOX EXPERIMENTAL -->
     <div class="sniche-item" data-niche="sandbox">
       <button class="sniche-header" aria-expanded="false" aria-controls="sub-sandbox">
-        <span class="sniche-icon-wrap niche-sandbox-bg"><i class="fas fa-flask"></i></span>
+        <span class="sniche-icon-wrap niche-sandbox-bg"><i class="fas fa-flask" aria-hidden="true"></i></span>
         <span class="sniche-label">Sandbox Experimental</span>
-        <i class="fas fa-chevron-right sniche-arrow"></i>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
       </button>
       <ul class="sniche-subnav" id="sub-sandbox" role="list">
-        <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="calculators"><i class="fas fa-calculator"></i> Calculadoras</a></li>
-        <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="prototypes"><i class="fas fa-puzzle-piece"></i> Protótipos Ativos</a></li>
-        <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="snippets"><i class="fas fa-terminal"></i> Code Snippets</a></li>
-        <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="tools"><i class="fas fa-wrench"></i> Ferramentas Live</a></li>
+        <div>
+          <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="calculators"><i class="fas fa-calculator" aria-hidden="true"></i> Calculadoras</a></li>
+          <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="prototypes"><i class="fas fa-puzzle-piece" aria-hidden="true"></i> Protótipos Ativos</a></li>
+          <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="snippets"><i class="fas fa-terminal" aria-hidden="true"></i> Code Snippets</a></li>
+          <li><a href="#" class="sub-link" data-niche="sandbox" data-filter="tools"><i class="fas fa-wrench" aria-hidden="true"></i> Ferramentas Live</a></li>
+        </div>
       </ul>
     </div>
 
   </nav>
 
-  <!-- Rodapé do sidebar -->
+  <!-- ── Rodapé do sidebar ── -->
+  <!--
+    CORREÇÃO v2.1: estrutura exata que o CSS v2.1 espera:
+    .sidebar-store-link
+      i (ícone principal)
+      div (wrapper com min-width:0 — textos não vazam)
+        span.ssl-title
+        span.ssl-sub
+      i.ssl-ext (seta externa, margem auto)
+  -->
   <div class="sidebar-foot">
     <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="sidebar-store-link" data-track="sidebar-store">
-      <i class="fas fa-bag-shopping"></i>
+      <i class="fas fa-bag-shopping" aria-hidden="true"></i>
       <div>
         <span class="ssl-title">Dryfour Shopping</span>
-        <span class="ssl-sub">Ofertas de hardware & tech</span>
+        <span class="ssl-sub">Ofertas de hardware &amp; tech</span>
       </div>
-      <i class="fas fa-arrow-up-right-from-square ssl-ext"></i>
+      <i class="fas fa-arrow-up-right-from-square ssl-ext" aria-hidden="true"></i>
     </a>
     <a href="https://www.dryfour.com.br" target="_blank" rel="noopener" class="sidebar-store-link" data-track="sidebar-construcao">
-      <i class="fas fa-helmet-safety"></i>
+      <i class="fas fa-helmet-safety" aria-hidden="true"></i>
       <div>
         <span class="ssl-title">Dryfour Construção</span>
-        <span class="ssl-sub">Drywall & Steel Frame RJ</span>
+        <span class="ssl-sub">Drywall &amp; Steel Frame RJ</span>
       </div>
-      <i class="fas fa-arrow-up-right-from-square ssl-ext"></i>
+      <i class="fas fa-arrow-up-right-from-square ssl-ext" aria-hidden="true"></i>
     </a>
   </div>
 
@@ -277,6 +335,10 @@
 <!-- /nexusSidebar -->
 
 <!-- ===== TICKER BAR ===== -->
+<!--
+  CORREÇÃO: pointer-events:none no CSS previne scroll-hijacking mobile.
+  JS duplica o conteúdo → translateX(-50%) = loop seamless sem gap.
+-->
 <div class="ticker-bar" id="tickerBar" aria-hidden="true">
   <div class="ticker-track" id="tickerTrack"></div>
 </div>
@@ -285,7 +347,7 @@
 <header class="site-header" id="siteHeader" role="banner">
   <nav class="navbar" aria-label="Navegação principal">
 
-    <!-- Hamburger — abre o sidebar drawer -->
+    <!-- Hamburger — micro-animação X ao abrir (3 .hb-bar via CSS) -->
     <button
       class="hamburger-btn"
       id="hamburgerBtn"
@@ -303,10 +365,10 @@
       DRY<span>FOUR</span> <span class="logo-nexus">NEXUS</span>
     </a>
 
-    <!-- Nav links desktop (≥1024px) — mapeados aos 8 nichos -->
+    <!-- Nav links desktop (ocultos em ≤1024px — sidebar assume) -->
     <ul class="nav-links" id="navLinks" role="list">
       <li><a href="#" class="nav-link active-nav" data-niche="default">Início</a></li>
-      <li><a href="#" class="nav-link" data-niche="ai">IA & Software</a></li>
+      <li><a href="#" class="nav-link" data-niche="ai">IA &amp; Software</a></li>
       <li><a href="#" class="nav-link" data-niche="smarthome">Smart Home</a></li>
       <li><a href="#" class="nav-link" data-niche="architecture">Arquitetura</a></li>
       <li><a href="#" class="nav-link" data-niche="hardware">Hardware</a></li>
@@ -338,23 +400,20 @@
         </div>
       </div>
 
-      <!-- Niche badge — indicador visual do nicho ativo -->
+      <!-- Niche badge — indicador do nicho ativo (oculto em ≤1024px) -->
       <div class="niche-badge" id="nicheBadge" aria-live="polite">
         <span class="niche-dot" id="nicheDot" aria-hidden="true"></span>
         <span class="niche-label-badge" id="nicheLabelBadge">NEXUS</span>
       </div>
 
     </div>
-    <!-- /nav-actions -->
-
   </nav>
 </header>
-<!-- /site-header -->
 
-<!-- ===== MAIN CONTENT ===== -->
+<!-- ===== MAIN ===== -->
 <main id="mainContent">
 
-  <!-- ===== HERO SECTION ===== -->
+  <!-- ===== HERO ===== -->
   <section class="hero-section" id="heroSection" aria-label="Destaque principal">
     <div class="hero-inner container">
 
@@ -370,17 +429,17 @@
           Pesquisadores do MIT revelam processadores neurais que superam em 400x os modelos LLM atuais. O futuro da inteligência artificial nunca esteve tão próximo — e tão imprevisível.
         </p>
         <div class="hero-meta">
-          <span class="hero-author"><i class="fas fa-user-astronaut"></i> Felipe Lima</span>
+          <span class="hero-author"><i class="fas fa-user-astronaut" aria-hidden="true"></i> Felipe Lima</span>
           <span class="hero-date" id="heroDate"></span>
-          <span class="hero-read"><i class="fas fa-clock"></i> 8 min</span>
-          <span class="hero-niche-tag" id="heroNicheTag">IA & Software</span>
+          <span class="hero-read"><i class="fas fa-clock" aria-hidden="true"></i> 8 min</span>
+          <span class="hero-niche-tag" id="heroNicheTag">Global</span>
         </div>
         <div class="hero-actions">
           <button class="btn-primary" id="heroCta">
-            Ler artigo completo <i class="fas fa-arrow-right"></i>
+            Ler artigo completo <i class="fas fa-arrow-right" aria-hidden="true"></i>
           </button>
           <button class="btn-ghost-light" id="heroShare">
-            <i class="fas fa-share-nodes"></i> Compartilhar
+            <i class="fas fa-share-nodes" aria-hidden="true"></i> Compartilhar
           </button>
         </div>
       </div>
@@ -395,7 +454,6 @@
             width="900" height="562"
           >
           <div class="hero-img-overlay" aria-hidden="true"></div>
-          <!-- Data display do hero — métricas ao vivo -->
           <div class="hero-data-grid" aria-hidden="true">
             <div class="hdg-item">
               <span class="hdg-val" id="hdgReaders">847</span>
@@ -415,76 +473,60 @@
 
     </div>
   </section>
-  <!-- /hero-section -->
 
-  <!-- ===== HORIZONTAL NICHE FILTER (8 nichos + sort) ===== -->
+  <!-- ===== HORIZONTAL NICHE FILTER ===== -->
   <!--
-    Touch-physics: overflow-x scroll com scroll-snap e inertia nativa.
-    scrollbar oculta via CSS pseudo-element — sem scroll-hijacking.
+    Touch-physics: scroll-snap + -webkit-overflow-scrolling:touch
+    Scrollbar oculta via CSS: scrollbar-width:none + ::-webkit-scrollbar{display:none}
+    Sem scroll-hijacking: pointer-events isolados do ticker.
   -->
   <div class="cat-filter-wrap" id="catFilterWrap">
     <div class="cat-filter-scroll-area container">
       <div class="cat-filter" id="catFilter" role="tablist" aria-label="Filtrar por nicho">
-
         <button class="cat-pill active" data-niche="default" role="tab" aria-selected="true" tabindex="0">
-          <i class="fas fa-border-all" aria-hidden="true"></i>
-          <span>Todos</span>
+          <i class="fas fa-border-all" aria-hidden="true"></i><span>Todos</span>
         </button>
         <button class="cat-pill" data-niche="ai" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-brain" aria-hidden="true"></i>
-          <span>IA & Software</span>
+          <i class="fas fa-brain" aria-hidden="true"></i><span>IA &amp; Software</span>
         </button>
         <button class="cat-pill" data-niche="smarthome" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-house-signal" aria-hidden="true"></i>
-          <span>Smart Home</span>
+          <i class="fas fa-house-signal" aria-hidden="true"></i><span>Smart Home</span>
         </button>
         <button class="cat-pill" data-niche="architecture" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-building" aria-hidden="true"></i>
-          <span>Arquitetura</span>
+          <i class="fas fa-building" aria-hidden="true"></i><span>Arquitetura</span>
         </button>
         <button class="cat-pill" data-niche="hardware" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-microchip" aria-hidden="true"></i>
-          <span>Hardware</span>
+          <i class="fas fa-microchip" aria-hidden="true"></i><span>Hardware</span>
         </button>
         <button class="cat-pill" data-niche="space" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-satellite" aria-hidden="true"></i>
-          <span>Espaço</span>
+          <i class="fas fa-satellite" aria-hidden="true"></i><span>Espaço</span>
         </button>
         <button class="cat-pill" data-niche="culture" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-infinity" aria-hidden="true"></i>
-          <span>Cultura</span>
+          <i class="fas fa-infinity" aria-hidden="true"></i><span>Cultura</span>
         </button>
         <button class="cat-pill" data-niche="sandbox" role="tab" aria-selected="false" tabindex="-1">
-          <i class="fas fa-flask" aria-hidden="true"></i>
-          <span>Sandbox</span>
+          <i class="fas fa-flask" aria-hidden="true"></i><span>Sandbox</span>
         </button>
-
-        <!-- Separador + sort button -->
         <div class="cat-filter-sep" aria-hidden="true"></div>
         <button class="sort-pill-top" id="sortBtnTop" aria-label="Ordenar artigos">
           <i class="fas fa-arrow-up-wide-short" aria-hidden="true"></i>
           <span id="sortLabelTop">Ordenar</span>
         </button>
-
       </div>
     </div>
   </div>
-  <!-- /cat-filter-wrap -->
 
-  <!-- ===== BENTO GRID — Bloco principal de notícias ===== -->
+  <!-- ===== BENTO GRID ===== -->
   <section class="bento-wrap container" aria-label="Grade de notícias" id="bentoSection">
     <div class="bento-grid" id="bentoGrid">
 
-      <!-- ============================================================
-           ROW 1: Featured (span 2) + Standard + Ad Zone
-           ============================================================ -->
+      <!-- ROW 1: Featured (span 2) + Standard + AdSense #1 -->
 
-      <!-- CARD FEATURED: span 2 colunas, nicho AI -->
       <article class="bento-card bento-featured" data-niche="ai" data-id="1" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80" alt="GPT-5 análise profunda" loading="lazy" width="800" height="450">
-          <span class="card-niche-badge cn-ai">IA & Software</span>
-          <span class="card-read-badge"><i class="fas fa-clock"></i> 12 min</span>
+          <span class="card-niche-badge cn-ai">IA &amp; Software</span>
+          <span class="card-read-badge"><i class="fas fa-clock" aria-hidden="true"></i> 12 min</span>
         </div>
         <div class="card-body">
           <span class="card-eyebrow">ANÁLISE EXCLUSIVA</span>
@@ -496,14 +538,13 @@
               <span>Felipe Lima</span>
             </div>
             <div class="card-stats">
-              <span><i class="fas fa-eye" aria-label="Visualizações"></i> 12.4k</span>
-              <span><i class="fas fa-comment" aria-label="Comentários"></i> 87</span>
+              <span><i class="fas fa-eye" aria-hidden="true"></i> 12.4k</span>
+              <span><i class="fas fa-comment" aria-hidden="true"></i> 87</span>
             </div>
           </div>
         </div>
       </article>
 
-      <!-- CARD STANDARD: Smart Home -->
       <article class="bento-card bento-standard" data-niche="smarthome" data-id="2" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1558002038-1055907df827?w=600&q=80" alt="Smart Home 2026" loading="lazy" width="600" height="338">
@@ -514,14 +555,14 @@
           <h2 class="card-title">Smart Home 2026: os 10 dispositivos que vão automatizar sua casa sem quebrar o orçamento</h2>
           <div class="card-footer">
             <span class="card-date">22 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 7 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 7 min</span>
           </div>
         </div>
       </article>
 
-      <!-- ADSENSE ZONE #1: Native Ad — blends with grid -->
+      <!-- AdSense #1 -->
       <div class="bento-card bento-ad adsense-wrapper" data-track="ad-impression" aria-label="Conteúdo patrocinado">
-        <div class="ad-label"><i class="fas fa-circle-info"></i> Patrocinado</div>
+        <div class="ad-label"><i class="fas fa-circle-info" aria-hidden="true"></i> Patrocinado</div>
         <div class="ad-content">
           <div class="ad-img-wrap">
             <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&q=80" alt="RTX 4090 — Dryfour Shopping" loading="lazy" width="400" height="225">
@@ -536,17 +577,14 @@
               <span class="ad-badge">-19%</span>
             </div>
             <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="ad-cta" data-track="ad-click">
-              Ver oferta <i class="fas fa-arrow-up-right-from-square"></i>
+              Ver oferta <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- ============================================================
-           ROW 2: Tall (span row 2) + Standard + Standard + Affiliate
-           ============================================================ -->
+      <!-- ROW 2: Tall (span row 2) + Standard + Standard + Affiliate #1 -->
 
-      <!-- CARD TALL: Hardware — span 2 rows -->
       <article class="bento-card bento-tall" data-niche="hardware" data-id="4" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80" alt="Hardware Quantum" loading="lazy" width="600" height="450">
@@ -557,21 +595,18 @@
           <h2 class="card-title">Quantum GPUs: como os chips de próxima geração da NVIDIA vão redesenhar toda a indústria de computação</h2>
           <p class="card-excerpt">Arquitetura Blackwell Ultra, memória HBM4 e integração quântica híbrida — análise técnica completa do que vem por aí em 2027.</p>
           <div class="card-tags">
-            <span class="tag">NVIDIA</span>
-            <span class="tag">Quantum</span>
-            <span class="tag">HBM4</span>
+            <span class="tag">NVIDIA</span><span class="tag">Quantum</span><span class="tag">HBM4</span>
           </div>
           <div class="card-footer">
             <div class="card-author">
               <div class="author-avatar" aria-hidden="true">NX</div>
               <span>NEXUS Editorial</span>
             </div>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 18 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 18 min</span>
           </div>
         </div>
       </article>
 
-      <!-- CARD STANDARD: Architecture -->
       <article class="bento-card bento-standard" data-niche="architecture" data-id="3" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1504307651254-35680f3366d4?w=600&q=80" alt="Drywall 3.0" loading="lazy" width="600" height="338">
@@ -582,12 +617,11 @@
           <h2 class="card-title">Drywall 3.0: o sistema modular que vai mudar como você constrói no Brasil</h2>
           <div class="card-footer">
             <span class="card-date">20 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 5 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 5 min</span>
           </div>
         </div>
       </article>
 
-      <!-- CARD STANDARD: Space -->
       <article class="bento-card bento-standard" data-niche="space" data-id="5" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=600&q=80" alt="Starlink v3" loading="lazy" width="600" height="338">
@@ -598,14 +632,14 @@
           <h2 class="card-title">Starlink v3: como 10 Gbps por satélite vai mudar a conectividade rural em 2027</h2>
           <div class="card-footer">
             <span class="card-date">19 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 6 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 6 min</span>
           </div>
         </div>
       </article>
 
-      <!-- AFFILIATE MODULE #1 -->
+      <!-- Affiliate #1 -->
       <div class="bento-card bento-affiliate" data-track="affiliate-view">
-        <div class="affiliate-label"><i class="fas fa-star"></i> Recomendado NEXUS</div>
+        <div class="affiliate-label"><i class="fas fa-star" aria-hidden="true"></i> Recomendado NEXUS</div>
         <div class="affiliate-inner">
           <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=300&q=80" alt="AMD Ryzen 9 7950X" loading="lazy" class="affiliate-img" width="300" height="188">
           <div class="affiliate-body">
@@ -618,17 +652,15 @@
               <div class="spec-row"><span class="spec-k">Cache L3</span><span class="spec-v">64 MB</span></div>
             </div>
             <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener sponsored" class="affiliate-btn" data-track="affiliate-click">
-              Ver no Dryfour Shopping <i class="fas fa-external-link"></i>
+              Ver no Dryfour Shopping <i class="fas fa-external-link" aria-hidden="true"></i>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- ============================================================
-           ROW 3: Wide (span 2 cols) + Standard + Standard
-           ============================================================ -->
+      <!-- ROW 3: Wide (span 2) + Standard + Store Showcase -->
 
-      <!-- CARD WIDE: Culture Sci-Fi — span 2 cols -->
+      <!-- CORREÇÃO v2.1: .bento-wide .wide-inner colapsa para 1 coluna em ≤768px -->
       <article class="bento-card bento-wide" data-niche="culture" data-id="6" tabindex="0" role="article">
         <div class="wide-inner">
           <div class="wide-img-wrap">
@@ -647,13 +679,12 @@
                 <div class="author-avatar" aria-hidden="true">FL</div>
                 <span>Felipe Lima</span>
               </div>
-              <span class="card-read-sm"><i class="fas fa-clock"></i> 11 min</span>
+              <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 11 min</span>
             </div>
           </div>
         </div>
       </article>
 
-      <!-- CARD STANDARD: Space -->
       <article class="bento-card bento-standard" data-niche="space" data-id="7" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1614642264762-d0a3b8bf3700?w=600&q=80" alt="NASA Artemis" loading="lazy" width="600" height="338">
@@ -664,33 +695,29 @@
           <h2 class="card-title">Artemis V: como a NASA vai instalar o primeiro datacenter na órbita lunar em 2028</h2>
           <div class="card-footer">
             <span class="card-date">17 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 9 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 9 min</span>
           </div>
         </div>
       </article>
 
-      <!-- STORE SHOWCASE (Interstitial Dryfour Shopping) -->
+      <!-- Store Showcase — preenchido pelo StoreModule -->
       <div class="bento-card bento-store-showcase adsense-wrapper" data-track="store-view">
         <div class="store-header">
-          <span class="store-label"><i class="fas fa-bag-shopping"></i> Dryfour Shopping</span>
+          <span class="store-label"><i class="fas fa-bag-shopping" aria-hidden="true"></i> Dryfour Shopping</span>
           <span class="store-subtitle">Produtos em destaque neste nicho</span>
         </div>
         <div class="store-products-mini" id="storeMiniGrid">
-          <!-- Preenchido dinamicamente pelo StoreModule em app.js -->
           <div class="nx-skeleton" style="height:52px;border-radius:8px;"></div>
           <div class="nx-skeleton" style="height:52px;border-radius:8px;margin-top:8px;"></div>
           <div class="nx-skeleton" style="height:52px;border-radius:8px;margin-top:8px;"></div>
         </div>
         <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="store-see-all" data-track="store-cta">
-          Ver catálogo completo <i class="fas fa-chevron-right"></i>
+          Ver catálogo completo <i class="fas fa-chevron-right" aria-hidden="true"></i>
         </a>
       </div>
 
-      <!-- ============================================================
-           ROW 4: Standard + Affiliate #2 + Standard + Standard
-           ============================================================ -->
+      <!-- ROW 4: Standard + Affiliate #2 + Standard + Standard -->
 
-      <!-- CARD STANDARD: Smart Home -->
       <article class="bento-card bento-standard" data-niche="smarthome" data-id="8" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1573148195900-7845dcb9b127?w=600&q=80" alt="IoT Security" loading="lazy" width="600" height="338">
@@ -701,14 +728,14 @@
           <h2 class="card-title">Câmeras IoT hackeadas: guia definitivo para blindar sua rede doméstica em 2026</h2>
           <div class="card-footer">
             <span class="card-date">18 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 6 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 6 min</span>
           </div>
         </div>
       </article>
 
-      <!-- AFFILIATE MODULE #2: Info-produto -->
+      <!-- Affiliate #2 — Info-produto -->
       <div class="bento-card bento-affiliate" data-track="affiliate-view">
-        <div class="affiliate-label"><i class="fas fa-graduation-cap"></i> Info-produto</div>
+        <div class="affiliate-label"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Info-produto</div>
         <div class="affiliate-inner">
           <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=300&q=80" alt="Curso IA Aplicada" loading="lazy" class="affiliate-img" width="300" height="188">
           <div class="affiliate-body">
@@ -721,13 +748,12 @@
               <div class="spec-row"><span class="spec-k">Certificado</span><span class="spec-v">Internacional</span></div>
             </div>
             <a href="#" class="affiliate-btn" data-track="affiliate-click">
-              Garantir acesso vitalício <i class="fas fa-external-link"></i>
+              Garantir acesso vitalício <i class="fas fa-external-link" aria-hidden="true"></i>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD STANDARD: Architecture -->
       <article class="bento-card bento-standard" data-niche="architecture" data-id="9" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80" alt="Steel Frame Brasil" loading="lazy" width="600" height="338">
@@ -738,12 +764,11 @@
           <h2 class="card-title">Steel Frame no Brasil: por que construtores migram da alvenaria para o sistema seco</h2>
           <div class="card-footer">
             <span class="card-date">17 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 9 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 9 min</span>
           </div>
         </div>
       </article>
 
-      <!-- CARD STANDARD: Culture -->
       <article class="bento-card bento-standard" data-niche="culture" data-id="10" tabindex="0" role="article">
         <div class="card-img-wrap">
           <img src="https://images.unsplash.com/photo-1593640495253-23196b27a87f?w=600&q=80" alt="Sci-Fi Gaming" loading="lazy" width="600" height="338">
@@ -754,18 +779,16 @@
           <h2 class="card-title">Os 15 jogos de ficção científica que moldaram o imaginário tecnológico da nossa geração</h2>
           <div class="card-footer">
             <span class="card-date">16 Mai 2026</span>
-            <span class="card-read-sm"><i class="fas fa-clock"></i> 10 min</span>
+            <span class="card-read-sm"><i class="fas fa-clock" aria-hidden="true"></i> 10 min</span>
           </div>
         </div>
       </article>
 
-      <!-- ============================================================
-           ROW 5: ADSENSE ZONE #2 + Wide Sandbox
-           ============================================================ -->
+      <!-- ROW 5: AdSense #2 + Wide Sandbox -->
 
-      <!-- ADSENSE ZONE #2 -->
+      <!-- AdSense #2 -->
       <div class="bento-card bento-ad adsense-wrapper" data-track="ad-impression" aria-label="Conteúdo patrocinado">
-        <div class="ad-label"><i class="fas fa-circle-info"></i> Patrocinado</div>
+        <div class="ad-label"><i class="fas fa-circle-info" aria-hidden="true"></i> Patrocinado</div>
         <div class="ad-content">
           <div class="ad-img-wrap">
             <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Monitor 4K — Dryfour Shopping" loading="lazy" width="400" height="225">
@@ -780,13 +803,12 @@
               <span class="ad-badge">-26%</span>
             </div>
             <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="ad-cta" data-track="ad-click">
-              Ver oferta <i class="fas fa-arrow-up-right-from-square"></i>
+              Ver oferta <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- CARD WIDE: Sandbox — span 2 cols -->
       <article class="bento-card bento-wide" data-niche="sandbox" data-id="11" tabindex="0" role="article">
         <div class="wide-inner">
           <div class="wide-img-wrap">
@@ -805,28 +827,26 @@
       </article>
 
     </div>
-    <!-- /bento-grid -->
   </section>
-  <!-- /bento-wrap -->
 
   <!-- ===== SANDBOX SECTION ===== -->
   <section class="sandbox-section" id="sandboxSection" aria-label="Laboratório interativo">
     <div class="container">
       <div class="section-header">
         <div class="section-header-left">
-          <span class="section-eyebrow"><i class="fas fa-flask"></i> Sandbox Experimental</span>
+          <span class="section-eyebrow"><i class="fas fa-flask" aria-hidden="true"></i> Sandbox Experimental</span>
           <h2 class="section-title">Ferramentas Interativas</h2>
           <p class="section-sub">Calculadoras e experimentos criados pelo NEXUS para seus projetos tech.</p>
         </div>
         <div class="sandbox-tabs" role="tablist" aria-label="Ferramentas do Sandbox">
           <button class="sandbox-tab active" data-tool="calc" role="tab" aria-selected="true">
-            <i class="fas fa-calculator"></i> ROI de IA
+            <i class="fas fa-calculator" aria-hidden="true"></i> ROI de IA
           </button>
           <button class="sandbox-tab" data-tool="drywall" role="tab" aria-selected="false">
-            <i class="fas fa-layer-group"></i> Estimador Drywall
+            <i class="fas fa-layer-group" aria-hidden="true"></i> Estimador Drywall
           </button>
           <button class="sandbox-tab" data-tool="iot" role="tab" aria-selected="false">
-            <i class="fas fa-network-wired"></i> Mapa IoT
+            <i class="fas fa-network-wired" aria-hidden="true"></i> Mapa IoT
           </button>
         </div>
       </div>
@@ -837,7 +857,7 @@
         <div class="sandbox-tool active" id="tool-calc" role="tabpanel" aria-label="Calculadora ROI de IA">
           <div class="sandbox-tool-inner">
             <div class="sandbox-inputs">
-              <h3 class="tool-title"><i class="fas fa-chart-line"></i> Calculadora de ROI — Implementação de IA</h3>
+              <h3 class="tool-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Calculadora de ROI — Implementação de IA</h3>
               <p class="tool-desc">Estime o retorno sobre investimento ao adotar ferramentas de IA na sua empresa.</p>
               <div class="input-group">
                 <label for="calcEmp">Funcionários impactados</label>
@@ -857,7 +877,7 @@
                 <input type="number" id="calcCost" value="500" min="0" class="tool-input">
               </div>
               <button class="btn-primary calc-run-btn" id="calcRunBtn">
-                <i class="fas fa-play"></i> Calcular ROI
+                <i class="fas fa-play" aria-hidden="true"></i> Calcular ROI
               </button>
             </div>
             <div class="sandbox-result" id="calcResult">
@@ -873,7 +893,7 @@
         <div class="sandbox-tool" id="tool-drywall" role="tabpanel" aria-label="Estimador de materiais Drywall">
           <div class="sandbox-tool-inner">
             <div class="sandbox-inputs">
-              <h3 class="tool-title"><i class="fas fa-ruler-combined"></i> Estimador de Materiais — Drywall</h3>
+              <h3 class="tool-title"><i class="fas fa-ruler-combined" aria-hidden="true"></i> Estimador de Materiais — Drywall</h3>
               <p class="tool-desc">Calcule chapas, perfis, parafusos e massa para seu projeto de drywall.</p>
               <div class="input-group">
                 <label for="dwArea">Área total das paredes (m²)</label>
@@ -885,14 +905,14 @@
               </div>
               <div class="input-group">
                 <label for="dwType">Tipo de ambiente</label>
-                <select id="dwType" class="tool-input tool-select" aria-label="Tipo de ambiente para drywall">
+                <select id="dwType" class="tool-input tool-select" aria-label="Tipo de ambiente">
                   <option value="standard">Padrão — ST (ambiente seco)</option>
                   <option value="wet">Área úmida — RU (banheiros)</option>
                   <option value="acoustic">Acústico — AR (home theater)</option>
                 </select>
               </div>
               <button class="btn-primary calc-run-btn" id="dwRunBtn">
-                <i class="fas fa-play"></i> Estimar materiais
+                <i class="fas fa-play" aria-hidden="true"></i> Estimar materiais
               </button>
             </div>
             <div class="sandbox-result" id="dwResult">
@@ -908,7 +928,7 @@
         <div class="sandbox-tool" id="tool-iot" role="tabpanel" aria-label="Mapa de dispositivos IoT">
           <div class="sandbox-tool-inner">
             <div class="sandbox-inputs">
-              <h3 class="tool-title"><i class="fas fa-house-signal"></i> Mapa de Dispositivos IoT</h3>
+              <h3 class="tool-title"><i class="fas fa-house-signal" aria-hidden="true"></i> Mapa de Dispositivos IoT</h3>
               <p class="tool-desc">Visualize e simule a topologia de dispositivos smart home em topologia estrela.</p>
               <div class="iot-device-list" id="iotDeviceList" role="group" aria-label="Selecionar dispositivos IoT">
                 <label class="iot-check">
@@ -937,7 +957,7 @@
                 </label>
               </div>
               <button class="btn-primary calc-run-btn" id="iotRunBtn">
-                <i class="fas fa-project-diagram"></i> Gerar Mapa
+                <i class="fas fa-project-diagram" aria-hidden="true"></i> Gerar Mapa
               </button>
             </div>
             <div class="sandbox-result" id="iotResult">
@@ -950,25 +970,21 @@
         </div>
 
       </div>
-      <!-- /sandbox-panel -->
     </div>
   </section>
-  <!-- /sandbox-section -->
 
-  <!-- ===== FEED DE ARTIGOS RECENTES ===== -->
+  <!-- ===== FEED RECENTES ===== -->
   <section class="latest-section container" aria-label="Artigos recentes" id="latestSection">
     <div class="section-header">
       <div class="section-header-left">
-        <span class="section-eyebrow"><i class="fas fa-rss"></i> Feed</span>
+        <span class="section-eyebrow"><i class="fas fa-rss" aria-hidden="true"></i> Feed</span>
         <h2 class="section-title">Mais recentes</h2>
       </div>
       <button class="btn-ghost-sm" id="loadMoreBtn">
-        <i class="fas fa-rotate"></i> Carregar mais
+        <i class="fas fa-rotate" aria-hidden="true"></i> Carregar mais
       </button>
     </div>
-    <!-- Grid preenchido pelo GridModule em app.js -->
     <div class="latest-grid" id="latestGrid" role="feed" aria-label="Lista de artigos recentes" aria-busy="false">
-      <!-- Skeletons enquanto carrega -->
       <div class="nx-skeleton"></div>
       <div class="nx-skeleton"></div>
       <div class="nx-skeleton"></div>
@@ -983,43 +999,25 @@
     <div class="newsletter-inner container">
       <div class="newsletter-left">
         <span class="section-eyebrow" style="color:var(--accent)">
-          <i class="fas fa-satellite-dish"></i> Sinal captado
+          <i class="fas fa-satellite-dish" aria-hidden="true"></i> Sinal captado
         </span>
         <h2>Receba o feed do futuro direto na sua caixa</h2>
         <p>Curadoria semanal dos 8 nichos: IA, hardware, espaço, smart home, arquitetura, cultura sci-fi e experimentos do Sandbox. Sem spam. Apenas sinal.</p>
         <ul class="newsletter-perks">
-          <li><i class="fas fa-check-circle"></i> Artigos exclusivos antes de publicar</li>
-          <li><i class="fas fa-check-circle"></i> Alertas de ferramentas do Sandbox</li>
-          <li><i class="fas fa-check-circle"></i> Ofertas curadas do Dryfour Shopping</li>
-          <li><i class="fas fa-check-circle"></i> Análises de hardware antes do lançamento</li>
+          <li><i class="fas fa-check-circle" aria-hidden="true"></i> Artigos exclusivos antes de publicar</li>
+          <li><i class="fas fa-check-circle" aria-hidden="true"></i> Alertas de ferramentas do Sandbox</li>
+          <li><i class="fas fa-check-circle" aria-hidden="true"></i> Ofertas curadas do Dryfour Shopping</li>
+          <li><i class="fas fa-check-circle" aria-hidden="true"></i> Análises de hardware antes do lançamento</li>
         </ul>
       </div>
       <div class="newsletter-right">
         <form class="newsletter-form" id="newsletterForm" novalidate aria-label="Formulário de inscrição na newsletter">
-          <input
-            type="text"
-            id="nlName"
-            placeholder="Seu nome"
-            required
-            class="nl-input"
-            autocomplete="given-name"
-            aria-label="Nome"
-            aria-required="true"
-          >
-          <input
-            type="email"
-            id="nlEmail"
-            placeholder="seu@email.com"
-            required
-            class="nl-input"
-            autocomplete="email"
-            aria-label="E-mail"
-            aria-required="true"
-          >
+          <input type="text" id="nlName" placeholder="Seu nome" required class="nl-input" autocomplete="given-name" aria-label="Nome" aria-required="true">
+          <input type="email" id="nlEmail" placeholder="seu@email.com" required class="nl-input" autocomplete="email" aria-label="E-mail" aria-required="true">
           <button type="submit" class="btn-primary nl-btn">
-            <i class="fas fa-paper-plane"></i> Quero o sinal
+            <i class="fas fa-paper-plane" aria-hidden="true"></i> Quero o sinal
           </button>
-          <p class="nl-legal"><i class="fas fa-shield-alt"></i> Dados protegidos. Cancele a qualquer momento.</p>
+          <p class="nl-legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> Dados protegidos. Cancele a qualquer momento.</p>
         </form>
         <div class="nl-success" id="nlSuccess" style="display:none" aria-live="polite">
           <i class="fas fa-satellite" aria-hidden="true"></i>
@@ -1031,7 +1029,6 @@
   </section>
 
 </main>
-<!-- /mainContent -->
 
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer" id="contato" role="contentinfo">
@@ -1054,11 +1051,11 @@
     <div class="footer-col">
       <h4>NICHOS</h4>
       <ul role="list">
-        <li><a href="#" data-niche="ai">IA & Software</a></li>
-        <li><a href="#" data-niche="smarthome">Smart Home & IoT</a></li>
+        <li><a href="#" data-niche="ai">IA &amp; Software</a></li>
+        <li><a href="#" data-niche="smarthome">Smart Home &amp; IoT</a></li>
         <li><a href="#" data-niche="architecture">Arquitetura 3.0</a></li>
         <li><a href="#" data-niche="hardware">Hardware Extremo</a></li>
-        <li><a href="#" data-niche="space">Espaço & Ciência</a></li>
+        <li><a href="#" data-niche="space">Espaço &amp; Ciência</a></li>
         <li><a href="#" data-niche="culture">Cultura Sci-Fi</a></li>
         <li><a href="#" data-niche="sandbox">Sandbox</a></li>
       </ul>
@@ -1080,9 +1077,9 @@
       <ul role="list">
         <li><a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener">Dryfour Shopping</a></li>
         <li><a href="https://www.dryfour.com.br" target="_blank" rel="noopener">Dryfour Construção</a></li>
-        <li><a href="mailto:dryfour.ofertas@gmail.com"><i class="fas fa-envelope"></i> dryfour.ofertas@gmail.com</a></li>
-        <li><address><i class="fas fa-phone"></i> (21) 98526-0805</address></li>
-        <li><address><i class="fas fa-map-pin"></i> Rio de Janeiro, RJ</address></li>
+        <li><a href="mailto:dryfour.ofertas@gmail.com"><i class="fas fa-envelope" aria-hidden="true"></i> dryfour.ofertas@gmail.com</a></li>
+        <li><address><i class="fas fa-phone" aria-hidden="true"></i> (21) 98526-0805</address></li>
+        <li><address><i class="fas fa-map-pin" aria-hidden="true"></i> Rio de Janeiro, RJ</address></li>
       </ul>
     </div>
 
@@ -1091,26 +1088,22 @@
   <div class="footer-bottom container">
     <span>© 2026 Dryfour NEXUS. Todos os direitos reservados.</span>
     <span class="footer-legal">
-      <i class="fas fa-circle-info"></i>
+      <i class="fas fa-circle-info" aria-hidden="true"></i>
       DRYFOUR DISTRIBUIDORA E EMPREENDIMENTOS LTDA. — CNPJ: 21.211.183/0001-64
     </span>
   </div>
 
-  <!--
-    ASSINATURA DO DESENVOLVEDOR — linha premium de crédito ao responsável técnico.
-    Posicionada na última linha do layout, após o footer-bottom.
-  -->
+  <!-- Assinatura do desenvolvedor — última linha do layout -->
   <div class="footer-credit">
     <span>Desenvolvido por Felipe de Souza Lima</span>
   </div>
 
 </footer>
-<!-- /site-footer -->
 
-<!-- Toast de notificações — aria-live para acessibilidade de leitores de tela -->
+<!-- Toast — aria-live para acessibilidade de leitores de tela -->
 <div id="toastContainer" role="region" aria-live="polite" aria-label="Notificações do sistema"></div>
 
-<!-- Overlay global (search, sidebar, mobile) -->
+<!-- Overlay global — search flyout -->
 <div class="site-overlay" id="siteOverlay" aria-hidden="true"></div>
 
 <script src="assets/app.js"></script>
