@@ -1,5 +1,5 @@
 // ============================================================
-// DRYFOUR NEXUS — api/index.go
+// DRYFOUR BLOG — api/index.go
 // Ponto de entrada Serverless para Vercel (Hobby Plan)
 //
 // COMO FUNCIONA NO VERCEL:
@@ -65,20 +65,20 @@ func initDB() {
 	dbOnce.Do(func() {
 		url := os.Getenv("NEON_DATABASE_URL")
 		if url == "" {
-			log.Println("[NEXUS] ℹ️  NEON_DATABASE_URL ausente — modo mock ativado")
+			log.Println("[DRYFOUR-BLOG] ℹ️  NEON_DATABASE_URL ausente — modo mock ativado")
 			dbConnected = false
 			return
 		}
 
 		// Tenta conectar com timeout de 8s (Vercel limita a 30s total)
 		if err := database.Connect(url); err != nil {
-			log.Printf("[NEXUS] ⚠️  Falha na conexão DB: %v — modo mock ativado", err)
+			log.Printf("[DRYFOUR-BLOG] ⚠️  Falha na conexão DB: %v — modo mock ativado", err)
 			dbConnected = false
 			return
 		}
 
 		dbConnected = true
-		log.Println("[NEXUS] ✅ Neon PostgreSQL conectado (serverless)")
+		log.Println("[DRYFOUR-BLOG] ✅ Neon PostgreSQL conectado (serverless)")
 	})
 }
 
@@ -131,7 +131,7 @@ func withCORS(next http.HandlerFunc) http.HandlerFunc {
 func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
-		log.Printf("[NEXUS] JSON encode error: %v", err)
+		log.Printf("[DRYFOUR-BLOG] JSON encode error: %v", err)
 	}
 }
 
@@ -186,7 +186,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	initDB()
 
 	// Log estruturado para o painel do Vercel
-	log.Printf("[NEXUS] %s %s — UA: %s", r.Method, r.URL.Path, r.Header.Get("User-Agent"))
+	log.Printf("[DRYFOUR-BLOG] %s %s — UA: %s", r.Method, r.URL.Path, r.Header.Get("User-Agent"))
 
 	// Distribui para o sub-router interno
 	route(w, r)
@@ -207,7 +207,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"status":    "online",
-		"service":   "Dryfour NEXUS",
+		"service":   "Dryfour Blog",
 		"version":   "2.1.0",
 		"db":        dbConnected,
 		"mode":      map[bool]string{true: "postgresql", false: "mock"}[dbConnected],
@@ -282,7 +282,7 @@ func handleNews(w http.ResponseWriter, r *http.Request) {
 	// GetAll usa mock se DB não estiver conectado — NUNCA retorna 500 por DB
 	posts, total, err := models.GetAll(filter)
 	if err != nil {
-		log.Printf("[NEXUS] GetAll error: %v", err)
+		log.Printf("[DRYFOUR-BLOG] GetAll error: %v", err)
 		writeError(w, http.StatusInternalServerError, "Erro interno ao buscar artigos")
 		return
 	}
