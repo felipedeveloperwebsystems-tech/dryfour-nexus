@@ -1,5 +1,5 @@
 // ============================================================
-// DRYFOUR BLOG — app.js  v2.1
+// DRYFOUR NEXUS — app.js  v2.1  (CORRIGIDO)
 // Arquitetura Modular — Zero dependências externas
 //
 // MÓDULOS:
@@ -37,7 +37,7 @@
 'use strict';
 
 /* ================================================================
-   BLOG STATE — Estado global centralizado
+   NEXUS STATE — Estado global centralizado
    Espelha AppState do Dryfour Shopping, expandido para 8 nichos.
    ================================================================ */
 const NexusState = {
@@ -65,7 +65,7 @@ const NexusState = {
    ================================================================ */
 const NICHES = {
   default: {
-    label:     'BLOG',
+    label:     'NEXUS',
     tagLabel:  'DESTAQUE DO DIA',
     nicheTag:  'Global',
     bodyClass: 'niche-default',
@@ -150,7 +150,7 @@ const NICHES = {
   },
   sandbox: {
     label:     'SANDBOX',
-    tagLabel:  'LABORATÓRIO DRYFOUR',
+    tagLabel:  'LABORATÓRIO NEXUS',
     nicheTag:  'Sandbox Experimental',
     bodyClass: 'niche-sandbox',
     hero: {
@@ -205,7 +205,7 @@ const TICKER_ITEMS = [
   { icon:'fas fa-building',      text:'Steel Frame cresce 340% em adoção no Brasil em 2026' },
   { icon:'fas fa-microchip',     text:'AMD Ryzen 9 9950X quebra recorde de single-core histórico' },
   { icon:'fas fa-satellite',     text:'SpaceX Starlink v3: 10 Gbps para residências previsto para 2027' },
-  { icon:'fas fa-flask',         text:'Dryfour Blog: novo estimador de drywall disponível agora' },
+  { icon:'fas fa-flask',         text:'Sandbox NEXUS: novo estimador de drywall disponível agora' },
   { icon:'fas fa-shield-alt',    text:'Vulnerabilidade crítica em câmeras IoT: atualize o firmware' },
   { icon:'fas fa-infinity',      text:'Manifesto Cyberpunk 2026: a estética que dominou o design da IA' },
   { icon:'fas fa-atom',          text:'IBM lança chip quântico de 1000 qubits para uso comercial' },
@@ -507,49 +507,79 @@ const HeroModule = {
 };
 
 /* ================================================================
-   GRID MODULE
-   CORREÇÃO [5]: style.display manipulado APENAS nos .bento-card[data-niche].
-   Nunca manipula .sniche-subnav — esse é domínio exclusivo do accordion.
+   GRID MODULE v3.0
+   - filter(): bento-grid principal usa ARTICLES_DB mock (inalterado)
+   - renderLatest(): busca da API /api/news e MESCLA com ARTICLES_DB mock
+     Artigos reais do banco aparecem PRIMEIRO com badge "Conteúdo real"
+     Artigos fictícios completam o feed para visualização do layout
+   - ArticleModal abre página de leitura ao clicar em card real
    ================================================================ */
 const GridModule = {
   filter(niche) {
-    // Mostra/oculta cards do bento-grid principal por nicho
     document.querySelectorAll('.bento-card[data-niche]').forEach(card => {
       const show = niche === 'default' || card.dataset.niche === niche;
-      // CORREÇÃO [5]: apenas bento-cards recebem display none/''
       card.style.display = show ? '' : 'none';
     });
-    // Atualiza o latest feed
     this.renderLatest(niche, NexusState.searchQuery);
   },
 
-  renderLatest(niche, query = '') {
+  async renderLatest(niche, query = '') {
     const grid = document.getElementById('latestGrid');
     if (!grid) return;
 
-    // Remove skeletons iniciais
-    grid.querySelectorAll('.nx-skeleton').forEach(s => s.remove());
+    // Skeletons enquanto carrega
+    grid.innerHTML = Array(6).fill('<div class="nx-skeleton"></div>').join('');
 
-    // Filtra por nicho
-    let articles = niche === 'default'
+    // 1. Busca artigos reais da API
+    let apiArticles = [];
+    try {
+      const nicheParam = (niche && niche !== 'default') ? `?niche=${niche}` : '';
+      const res = await fetch(`/api/news${nicheParam}`);
+      if (res.ok) {
+        const json = await res.json();
+        apiArticles = (json.data || []).map(a => ({
+          id:       'api_' + a.id,
+          niche:    a.niche,
+          title:    a.title,
+          img:      a.img_url || 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80',
+          readTime: a.read_time,
+          date:     new Date(a.published_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' }),
+          views:    a.views || 0,
+          excerpt:  a.excerpt || '',
+          content:  a.content || '',
+          author:   a.author || 'Dryfour Blog Editorial',
+          slug:     a.slug,
+          isReal:   true,
+        }));
+      }
+    } catch(e) {
+      console.warn('[DRYFOUR-BLOG] API indisponível — usando apenas mock', e);
+    }
+
+    // 2. Mock filtrado por nicho
+    let mockArticles = niche === 'default'
       ? [...ARTICLES_DB]
       : ARTICLES_DB.filter(a => a.niche === niche);
 
     // Filtra por busca
     if (query) {
       const q = query.toLowerCase();
-      articles = articles.filter(a =>
-        a.title.toLowerCase().includes(q) ||
-        a.niche.toLowerCase().includes(q)
-      );
+      const fn = a => a.title.toLowerCase().includes(q) || a.niche.toLowerCase().includes(q);
+      apiArticles  = apiArticles.filter(fn);
+      mockArticles = mockArticles.filter(fn);
     }
 
-    // Ordena
-    if      (NexusState.sortMode === 'popular') articles.sort((a, b) => b.views - a.views);
-    else if (NexusState.sortMode === 'oldest')  articles.sort((a, b) => a.id - b.id);
-    else                                         articles.sort((a, b) => b.id - a.id);
+    // 3. Remove do mock slugs que já existem na API
+    const apiSlugs = new Set(apiArticles.map(a => a.slug));
+    mockArticles = mockArticles.filter(a => !apiSlugs.has(a.slug));
 
-    articles = articles.slice(0, 6);
+    // 4. Mescla: reais primeiro, mock depois
+    let articles = [...apiArticles, ...mockArticles];
+
+    if (NexusState.sortMode === 'popular') articles.sort((a, b) => b.views - a.views);
+    else if (NexusState.sortMode === 'oldest') articles.sort((a, b) => a.isReal ? -1 : 1);
+
+    articles = articles.slice(0, 9);
 
     const nicheLabels = {
       ai:'IA & Software', smarthome:'Smart Home', architecture:'Arquitetura',
@@ -566,36 +596,123 @@ const GridModule = {
     }
 
     grid.innerHTML = articles.map(a => `
-      <article class="latest-card" role="article" data-id="${a.id}" data-niche="${a.niche}" tabindex="0">
+      <article class="latest-card${a.isReal ? ' latest-card--real' : ''}"
+               role="article" data-id="${a.id}" data-niche="${a.niche}"
+               data-real="${a.isReal ? '1' : '0'}" tabindex="0">
+        ${a.isReal ? '<span class="real-badge"><i class="fas fa-database" aria-hidden="true"></i> Conteúdo real</span>' : ''}
         <div class="latest-card-img">
           <img src="${a.img}" alt="${a.title}" loading="lazy" width="600" height="300">
         </div>
         <div class="latest-card-body">
           <span class="latest-card-niche">${nicheLabels[a.niche] || a.niche}</span>
           <h3 class="latest-card-title">${a.title}</h3>
+          ${a.isReal && a.excerpt ? `<p class="latest-card-excerpt">${a.excerpt}</p>` : ''}
           <div class="latest-card-foot">
+            <span>${a.author || ''}</span>
             <span>${a.date}</span>
             <span><i class="fas fa-clock" aria-hidden="true"></i> ${a.readTime} min</span>
-            <span><i class="fas fa-eye" aria-hidden="true"></i> ${(a.views / 1000).toFixed(1)}k</span>
           </div>
         </div>
       </article>
     `).join('');
 
-    // Event listeners nos cards recém-criados
+    // Event listeners
     grid.querySelectorAll('.latest-card').forEach(card => {
-      const openArticle = () => {
-        const art = ARTICLES_DB.find(a => a.id === +card.dataset.id);
-        if (art) showToast(`Abrindo: "${art.title.slice(0, 45)}…"`, 'info');
+      const open = () => {
+        if (card.dataset.real === '1') {
+          ArticleModal.open(articles.find(a => a.id === card.dataset.id));
+        } else {
+          const art = ARTICLES_DB.find(a => String(a.id) === card.dataset.id);
+          if (art) showToast(`Abrindo: "${art.title.slice(0, 45)}…"`, 'info');
+        }
         MonetizationEngine.track('article-click', { id: card.dataset.id });
       };
-      card.addEventListener('click', openArticle);
+      card.addEventListener('click', open);
       card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openArticle(); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
       });
     });
   },
 };
+
+/* ================================================================
+   ARTICLE MODAL — Página de leitura do artigo real
+   Abre sobre o layout existente, fecha com ESC, X ou overlay.
+   ================================================================ */
+const ArticleModal = {
+  el: null,
+
+  init() {
+    const div = document.createElement('div');
+    div.id = 'articleModal';
+    div.setAttribute('role', 'dialog');
+    div.setAttribute('aria-modal', 'true');
+    div.setAttribute('aria-label', 'Leitura do artigo');
+    div.innerHTML = `
+      <div class="am-overlay" id="amOverlay"></div>
+      <div class="am-panel" role="document">
+        <button class="am-close" id="amClose" aria-label="Fechar artigo">
+          <i class="fas fa-xmark"></i>
+        </button>
+        <div class="am-content" id="amContent"></div>
+      </div>
+    `;
+    document.body.appendChild(div);
+    this.el = div;
+    document.getElementById('amClose').addEventListener('click', () => this.close());
+    document.getElementById('amOverlay').addEventListener('click', () => this.close());
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.close(); });
+  },
+
+  open(article) {
+    if (!article) return;
+    const nicheLabels = {
+      ai:'IA & Software', smarthome:'Smart Home & Domótica',
+      architecture:'Arquitetura & Engenharia', hardware:'Hardware Extremo',
+      space:'Espaço & Ciência', culture:'Cultura Sci-Fi', sandbox:'Sandbox',
+    };
+    document.getElementById('amContent').innerHTML = `
+      <div class="am-hero">
+        <img src="${article.img}" alt="${article.title}" class="am-hero-img">
+        <div class="am-hero-overlay"></div>
+      </div>
+      <div class="am-body">
+        <div class="am-meta-top">
+          <span class="am-niche-tag">${nicheLabels[article.niche] || article.niche}</span>
+          <span class="am-date">${article.date}</span>
+          <span class="am-read"><i class="fas fa-clock" aria-hidden="true"></i> ${article.readTime} min de leitura</span>
+        </div>
+        <h1 class="am-title">${article.title}</h1>
+        <div class="am-author-row">
+          <div class="am-avatar">${(article.author || 'D').charAt(0)}</div>
+          <div>
+            <span class="am-author-name">${article.author || 'Dryfour Blog Editorial'}</span>
+            <span class="am-author-label">Dryfour Blog</span>
+          </div>
+        </div>
+        <p class="am-excerpt">${article.excerpt || ''}</p>
+        <div class="am-text">${(article.content || '<p>Conteúdo em breve.</p>').replace(/\n/g, '<br>')}</div>
+        <div class="am-footer">
+          <a href="https://www.dryfour.com.br" target="_blank" rel="noopener" class="am-cta">
+            <i class="fas fa-helmet-safety" aria-hidden="true"></i> Conhecer a Dryfour Construção
+          </a>
+          <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="am-cta am-cta--shop">
+            <i class="fas fa-bag-shopping" aria-hidden="true"></i> Dryfour Shopping
+          </a>
+        </div>
+      </div>
+    `;
+    this.el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('amClose').focus();
+  },
+
+  close() {
+    this.el.classList.remove('open');
+    document.body.style.overflow = '';
+  },
+};
+
 
 /* ================================================================
    STORE MODULE — produtos do Dryfour Shopping por nicho
@@ -780,7 +897,7 @@ const SandboxEngine = {
    ================================================================ */
 const MonetizationEngine = {
   track(event, data = {}) {
-    console.debug(`[BLOG:MON] ${event}`, data);
+    console.debug(`[NEXUS:MON] ${event}`, data);
     const m = NexusState.monetization;
     if (event === 'ad-click')        m.adClicks++;
     if (event === 'ad-impression')   m.adImpressions++;
@@ -960,7 +1077,7 @@ function initCardInteractions() {
 
   document.getElementById('heroShare')?.addEventListener('click', () => {
     if (navigator.share) {
-      navigator.share({ title:'Dryfour Blog', url:window.location.href }).catch(() => {});
+      navigator.share({ title:'Dryfour NEXUS', url:window.location.href }).catch(() => {});
     } else {
       navigator.clipboard?.writeText(window.location.href);
       showToast('Link copiado para a área de transferência!', 'success');
@@ -1037,13 +1154,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // 12. Bento card interactions
   initCardInteractions();
 
+  // 13. Article Modal — página de leitura
+  ArticleModal.init();
+
+  // 13. Article Modal
+  ArticleModal.init();
+
   // 13. Welcome toast
   setTimeout(() => {
-    showToast('Dryfour Blog v2.1 — 8 nichos ativos.', 'success');
+    showToast('NEXUS v2.1 — 8 nichos ativos. Sidebar corrigido.', 'success');
   }, 900);
 
   // 14. Debug
-  console.log('%c🚀 DRYFOUR BLOG v2.1', 'color:#00E5FF;font-weight:bold;font-size:16px');
-  console.log('%cDryfour Blog | 8 nichos | ThemeEngine | SandboxEngine | 60fps', 'color:#475569;font-size:11px');
+  console.log('%c🚀 DRYFOUR NEXUS v2.1', 'color:#00E5FF;font-weight:bold;font-size:16px');
+  console.log('%c8 nichos | Accordion grid-rows | ThemeEngine | SandboxEngine | 60fps', 'color:#475569;font-size:11px');
   console.log('%cNexusState:', 'color:#94A3B8', NexusState);
 });
