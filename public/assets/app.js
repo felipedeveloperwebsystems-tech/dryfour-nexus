@@ -1,5 +1,5 @@
 // ============================================================
-// DRYFOUR NEXUS — app.js  v2.1  (CORRIGIDO)
+// DRYFOUR BLOG — app.js  v2.1
 // Arquitetura Modular — Zero dependências externas
 //
 // MÓDULOS:
@@ -37,7 +37,7 @@
 'use strict';
 
 /* ================================================================
-   NEXUS STATE — Estado global centralizado
+   BLOG STATE — Estado global centralizado
    Espelha AppState do Dryfour Shopping, expandido para 8 nichos.
    ================================================================ */
 const NexusState = {
@@ -65,7 +65,7 @@ const NexusState = {
    ================================================================ */
 const NICHES = {
   default: {
-    label:     'NEXUS',
+    label:     'BLOG',
     tagLabel:  'DESTAQUE DO DIA',
     nicheTag:  'Global',
     bodyClass: 'niche-default',
@@ -150,7 +150,7 @@ const NICHES = {
   },
   sandbox: {
     label:     'SANDBOX',
-    tagLabel:  'LABORATÓRIO NEXUS',
+    tagLabel:  'LABORATÓRIO DRYFOUR',
     nicheTag:  'Sandbox Experimental',
     bodyClass: 'niche-sandbox',
     hero: {
@@ -205,7 +205,7 @@ const TICKER_ITEMS = [
   { icon:'fas fa-building',      text:'Steel Frame cresce 340% em adoção no Brasil em 2026' },
   { icon:'fas fa-microchip',     text:'AMD Ryzen 9 9950X quebra recorde de single-core histórico' },
   { icon:'fas fa-satellite',     text:'SpaceX Starlink v3: 10 Gbps para residências previsto para 2027' },
-  { icon:'fas fa-flask',         text:'Sandbox NEXUS: novo estimador de drywall disponível agora' },
+  { icon:'fas fa-flask',         text:'Dryfour Blog: novo estimador de drywall disponível agora' },
   { icon:'fas fa-shield-alt',    text:'Vulnerabilidade crítica em câmeras IoT: atualize o firmware' },
   { icon:'fas fa-infinity',      text:'Manifesto Cyberpunk 2026: a estética que dominou o design da IA' },
   { icon:'fas fa-atom',          text:'IBM lança chip quântico de 1000 qubits para uso comercial' },
@@ -780,7 +780,7 @@ const SandboxEngine = {
    ================================================================ */
 const MonetizationEngine = {
   track(event, data = {}) {
-    console.debug(`[NEXUS:MON] ${event}`, data);
+    console.debug(`[BLOG:MON] ${event}`, data);
     const m = NexusState.monetization;
     if (event === 'ad-click')        m.adClicks++;
     if (event === 'ad-impression')   m.adImpressions++;
@@ -960,7 +960,7 @@ function initCardInteractions() {
 
   document.getElementById('heroShare')?.addEventListener('click', () => {
     if (navigator.share) {
-      navigator.share({ title:'Dryfour NEXUS', url:window.location.href }).catch(() => {});
+      navigator.share({ title:'Dryfour Blog', url:window.location.href }).catch(() => {});
     } else {
       navigator.clipboard?.writeText(window.location.href);
       showToast('Link copiado para a área de transferência!', 'success');
@@ -1039,11 +1039,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 13. Welcome toast
   setTimeout(() => {
-    showToast('NEXUS v2.1 — 8 nichos ativos. Sidebar corrigido.', 'success');
+    showToast('Dryfour Blog v2.1 — 8 nichos ativos.', 'success');
   }, 900);
 
   // 14. Debug
-  console.log('%c🚀 DRYFOUR NEXUS v2.1', 'color:#00E5FF;font-weight:bold;font-size:16px');
-  console.log('%c8 nichos | Accordion grid-rows | ThemeEngine | SandboxEngine | 60fps', 'color:#475569;font-size:11px');
+  console.log('%c🚀 DRYFOUR BLOG v2.1', 'color:#00E5FF;font-weight:bold;font-size:16px');
+  console.log('%cDryfour Blog | 8 nichos | ThemeEngine | SandboxEngine | 60fps', 'color:#475569;font-size:11px');
   console.log('%cNexusState:', 'color:#94A3B8', NexusState);
 });

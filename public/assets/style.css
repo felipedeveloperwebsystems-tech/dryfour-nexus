@@ -1,6 +1,6 @@
 /* ============================================================
-   DRYFOUR NEXUS — style.css  v2.1  (CORRIGIDO)
-   Light-Tech / White Sci-Fi — 8-Tier Niche System
+   DRYFOUR BLOG — style.css  v2.1  (CORRIGIDO)
+   Light-Tech / White Sci-Fi — 8 Nichos
    Sidebar Drawer | Bento Grid | Mobile 320px→1920px
    Glassmorphism Light | Dynamic CSS Themes via body class
 
@@ -246,7 +246,7 @@ input, select, textarea { font-family: var(--font-b); }
 }
 
 /* ===================================================================
-   NEXUS SIDEBAR DRAWER
+   SIDEBAR DRAWER
    CORREÇÃO [1]: will-change:transform promove para GPU layer →
    backdrop-filter roda em compositing thread → 60 FPS garantido.
    CORREÇÃO: overflow-y:auto + overscroll-behavior:contain previne
