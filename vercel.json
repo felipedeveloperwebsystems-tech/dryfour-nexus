@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": "public",
   "routes": [
     {
       "src": "^/api/(.*)",
@@ -17,12 +18,12 @@
       "dest": "/api/index.go"
     },
     {
-      "src": "^/assets/(.*)",
-      "dest": "/public/assets/$1"
+      "src": "^/assets/(.*\\.(?:css|js|png|jpg|svg|ico|woff2?))",
+      "dest": "/assets/$1"
     },
     {
-      "src": "^/((?!api/).*)",
-      "dest": "/public/index.html"
+      "src": "^/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [
@@ -31,7 +32,6 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
-        { "key": "X-XSS-Protection",       "value": "1; mode=block" },
         { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" }
       ]
     },
