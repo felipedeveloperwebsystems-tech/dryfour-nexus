@@ -620,7 +620,8 @@ const GridModule = {
     grid.querySelectorAll('.latest-card').forEach(card => {
       const open = () => {
         if (card.dataset.real === '1') {
-          ArticleModal.open(articles.find(a => a.id === card.dataset.id));
+          // Navega para a página dedicada do artigo
+          window.location.href = `/artigo.html?id=${card.dataset.id.replace('api_', '')}`;
         } else {
           const art = ARTICLES_DB.find(a => String(a.id) === card.dataset.id);
           if (art) showToast(`Abrindo: "${art.title.slice(0, 45)}…"`, 'info');

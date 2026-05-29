@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" id="metaDesc" content="Dryfour Blog — Artigo">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dryfour Blog">
+  <meta name="author" id="metaAuthor" content="Dryfour Blog">
+  <meta name="theme-color" content="#F5F7FA">
+  <title id="pageTitle">Dryfour Blog | Artigo</title>
+
+  <!-- CSS crítico anti-FOUC -->
+  <style>
+    html, body { background:#F5F7FA; color:#0F172A; margin:0; padding:0;
+      font-family:system-ui,-apple-system,sans-serif; overflow-x:hidden; }
+    .art-skeleton {
+      background:linear-gradient(90deg,#e8edf5 25%,#f0f4fa 50%,#e8edf5 75%);
+      background-size:200% 100%; animation:shimmer 1.4s ease-in-out infinite;
+      border-radius:12px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/artigo.css">
+</head>
+<body class="niche-default art-page">
+
+<!-- ===== SKIP LINK ===== -->
+<a class="skip-link" href="#artContent">Ir para o conteúdo do artigo</a>
+
+<!-- ===== SIDEBAR OVERLAY ===== -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+<!-- ===== SIDEBAR (reutiliza o mesmo do index) ===== -->
+<aside class="nexus-sidebar" id="nexusSidebar" role="navigation"
+  aria-modal="true" aria-label="Menu de nichos e categorias" aria-hidden="true">
+  <div class="sidebar-head">
+    <div class="sidebar-brand">
+      <span class="sidebar-logo">DRY<span>FOUR</span> <span class="sidebar-logo-nexus">BLOG</span></span>
+      <span class="sidebar-tagline">Portal Tech & Sci-Fi</span>
+    </div>
+    <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Fechar menu">
+      <i class="fas fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="sidebar-search-box">
+    <i class="fas fa-magnifying-glass sidebar-search-icon" aria-hidden="true"></i>
+    <input type="search" class="sidebar-search-input" id="sidebarSearchInput"
+      placeholder="Buscar artigos, nichos…" autocomplete="off" aria-label="Buscar no Dryfour Blog">
+    <button class="sidebar-search-clear" id="sidebarSearchClear" aria-label="Limpar busca" style="display:none">
+      <i class="fas fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <nav class="sidebar-nav" aria-label="Diretório de categorias">
+    <div class="sidebar-nav-label">NICHOS &amp; CATEGORIAS</div>
+    <div class="sniche-item" data-niche="default">
+      <button class="sniche-header active-sniche" aria-expanded="false" aria-controls="sub-default">
+        <span class="sniche-icon-wrap niche-default-bg"><i class="fas fa-border-all" aria-hidden="true"></i></span>
+        <span class="sniche-label">Página Inicial</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-default" role="list"><div>
+        <li><a href="/" class="sub-link"><i class="fas fa-rss" aria-hidden="true"></i> Feed Global</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="ai">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-ai">
+        <span class="sniche-icon-wrap niche-ai-bg"><i class="fas fa-brain" aria-hidden="true"></i></span>
+        <span class="sniche-label">Inteligência &amp; Software</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-ai" role="list"><div>
+        <li><a href="/?niche=ai" class="sub-link"><i class="fas fa-robot" aria-hidden="true"></i> Modelos LLM</a></li>
+        <li><a href="/?niche=ai" class="sub-link"><i class="fas fa-code" aria-hidden="true"></i> Dev Tools</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="architecture">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-architecture">
+        <span class="sniche-icon-wrap niche-architecture-bg"><i class="fas fa-building" aria-hidden="true"></i></span>
+        <span class="sniche-label">Arquitetura &amp; Engenharia</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-architecture" role="list"><div>
+        <li><a href="/?niche=architecture" class="sub-link"><i class="fas fa-layer-group" aria-hidden="true"></i> Drywall 3.0</a></li>
+        <li><a href="/?niche=architecture" class="sub-link"><i class="fas fa-cubes" aria-hidden="true"></i> Steel Frame</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="smarthome">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-smarthome">
+        <span class="sniche-icon-wrap niche-smarthome-bg"><i class="fas fa-house-signal" aria-hidden="true"></i></span>
+        <span class="sniche-label">Smart Home &amp; Domótica</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-smarthome" role="list"><div>
+        <li><a href="/?niche=smarthome" class="sub-link"><i class="fas fa-wifi" aria-hidden="true"></i> Dispositivos IoT</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="hardware">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-hardware">
+        <span class="sniche-icon-wrap niche-hardware-bg"><i class="fas fa-microchip" aria-hidden="true"></i></span>
+        <span class="sniche-label">Hardware Extremo</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-hardware" role="list"><div>
+        <li><a href="/?niche=hardware" class="sub-link"><i class="fas fa-tv" aria-hidden="true"></i> GPUs</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="space">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-space">
+        <span class="sniche-icon-wrap niche-space-bg"><i class="fas fa-satellite" aria-hidden="true"></i></span>
+        <span class="sniche-label">Espaço &amp; Ciência</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-space" role="list"><div>
+        <li><a href="/?niche=space" class="sub-link"><i class="fas fa-rocket" aria-hidden="true"></i> Aeroespacial</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="culture">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-culture">
+        <span class="sniche-icon-wrap niche-culture-bg"><i class="fas fa-infinity" aria-hidden="true"></i></span>
+        <span class="sniche-label">Cultura Sci-Fi</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-culture" role="list"><div>
+        <li><a href="/?niche=culture" class="sub-link"><i class="fas fa-gamepad" aria-hidden="true"></i> Sci-Fi Gaming</a></li>
+      </div></ul>
+    </div>
+    <div class="sniche-item" data-niche="sandbox">
+      <button class="sniche-header" aria-expanded="false" aria-controls="sub-sandbox">
+        <span class="sniche-icon-wrap niche-sandbox-bg"><i class="fas fa-flask" aria-hidden="true"></i></span>
+        <span class="sniche-label">Sandbox</span>
+        <i class="fas fa-chevron-right sniche-arrow" aria-hidden="true"></i>
+      </button>
+      <ul class="sniche-subnav" id="sub-sandbox" role="list"><div>
+        <li><a href="/?niche=sandbox" class="sub-link"><i class="fas fa-calculator" aria-hidden="true"></i> Calculadoras</a></li>
+      </div></ul>
+    </div>
+  </nav>
+  <div class="sidebar-foot">
+    <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="sidebar-store-link">
+      <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+      <div><span class="ssl-title">Dryfour Shopping</span><span class="ssl-sub">Ofertas de hardware &amp; tech</span></div>
+      <i class="fas fa-arrow-up-right-from-square ssl-ext" aria-hidden="true"></i>
+    </a>
+    <a href="https://www.dryfour.com.br" target="_blank" rel="noopener" class="sidebar-store-link">
+      <i class="fas fa-helmet-safety" aria-hidden="true"></i>
+      <div><span class="ssl-title">Dryfour Construção</span><span class="ssl-sub">Drywall &amp; Steel Frame RJ</span></div>
+      <i class="fas fa-arrow-up-right-from-square ssl-ext" aria-hidden="true"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ===== TICKER ===== -->
+<div class="ticker-bar" id="tickerBar" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader" role="banner">
+  <nav class="navbar" aria-label="Navegação principal">
+    <button class="hamburger-btn" id="hamburgerBtn"
+      aria-label="Abrir menu" aria-expanded="false" aria-controls="nexusSidebar">
+      <span class="hb-bar"></span>
+      <span class="hb-bar"></span>
+      <span class="hb-bar"></span>
+    </button>
+    <a href="/" class="logo" aria-label="Dryfour Blog — Página inicial">
+      DRY<span>FOUR</span> <span class="logo-nexus">BLOG</span>
+    </a>
+    <!-- Breadcrumb no lugar do nav-links -->
+    <nav class="art-breadcrumb" aria-label="Localização" id="artBreadcrumb">
+      <a href="/" class="art-bc-home"><i class="fas fa-home" aria-hidden="true"></i> Início</a>
+      <i class="fas fa-chevron-right art-bc-sep" aria-hidden="true"></i>
+      <span class="art-bc-niche" id="artBcNiche">Artigo</span>
+      <i class="fas fa-chevron-right art-bc-sep" aria-hidden="true"></i>
+      <span class="art-bc-title" id="artBcTitle">Carregando…</span>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="artShareBtn" aria-label="Compartilhar artigo">
+        <i class="fas fa-share-nodes" aria-hidden="true"></i>
+      </button>
+      <div class="niche-badge" id="nicheBadge" aria-live="polite">
+        <span class="niche-dot" id="nicheDot" aria-hidden="true"></span>
+        <span class="niche-label-badge" id="nicheLabelBadge">BLOG</span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ===== CONTEÚDO PRINCIPAL ===== -->
+<main id="artContent">
+
+  <!-- Estado de carregamento -->
+  <div id="artLoading" class="art-loading-state">
+    <div class="art-sk-hero art-skeleton"></div>
+    <div class="container art-sk-body">
+      <div class="art-sk-line art-skeleton" style="width:60%;height:14px;"></div>
+      <div class="art-sk-line art-skeleton" style="width:80%;height:40px;margin-top:16px;"></div>
+      <div class="art-sk-line art-skeleton" style="width:40%;height:14px;margin-top:12px;"></div>
+      <div class="art-sk-line art-skeleton" style="height:200px;margin-top:32px;"></div>
+      <div class="art-sk-line art-skeleton" style="height:14px;margin-top:16px;"></div>
+      <div class="art-sk-line art-skeleton" style="height:14px;margin-top:8px;width:90%;"></div>
+      <div class="art-sk-line art-skeleton" style="height:14px;margin-top:8px;width:75%;"></div>
+    </div>
+  </div>
+
+  <!-- Estado de erro -->
+  <div id="artError" class="art-error-state" style="display:none">
+    <div class="container">
+      <div class="art-error-inner">
+        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+        <h1>Artigo não encontrado</h1>
+        <p>O artigo que você procura não existe ou foi removido.</p>
+        <a href="/" class="btn-primary">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar ao início
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Artigo renderizado -->
+  <article id="artMain" style="display:none" itemscope itemtype="https://schema.org/Article">
+
+    <!-- Hero com imagem de capa -->
+    <div class="art-hero" id="artHero">
+      <img id="artHeroImg" src="" alt="" class="art-hero-img" loading="eager"
+        itemprop="image" width="1200" height="630">
+      <div class="art-hero-overlay" aria-hidden="true"></div>
+      <div class="art-hero-content container">
+        <div class="art-hero-meta">
+          <span class="art-niche-tag" id="artNicheTag"></span>
+          <span class="art-hero-date" id="artHeroDate"></span>
+          <span class="art-hero-read" id="artHeroRead">
+            <i class="fas fa-clock" aria-hidden="true"></i> <span id="artReadTime"></span> min
+          </span>
+        </div>
+        <h1 class="art-hero-title" id="artTitle" itemprop="headline"></h1>
+        <div class="art-hero-author">
+          <div class="art-author-avatar" id="artAuthorAvatar" aria-hidden="true"></div>
+          <div>
+            <span class="art-author-name" id="artAuthorName" itemprop="author"></span>
+            <span class="art-author-label">Dryfour Blog</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout de duas colunas: conteúdo + sidebar direita -->
+    <div class="art-layout container">
+
+      <!-- Coluna principal — conteúdo do artigo -->
+      <div class="art-main-col">
+
+        <!-- Excerpt destacado -->
+        <blockquote class="art-excerpt" id="artExcerpt" itemprop="description"></blockquote>
+
+        <!-- Barra de progresso de leitura -->
+        <div class="art-progress-bar" id="artProgressBar" aria-hidden="true">
+          <div class="art-progress-fill" id="artProgressFill"></div>
+        </div>
+
+        <!-- Corpo do artigo -->
+        <div class="art-body" id="artBody" itemprop="articleBody"></div>
+
+        <!-- Tags do artigo -->
+        <div class="art-tags-row" id="artTagsRow"></div>
+
+        <!-- Compartilhar -->
+        <div class="art-share-row">
+          <span class="art-share-label">Compartilhar</span>
+          <div class="art-share-btns">
+            <button class="art-share-btn" id="shareWhatsApp" aria-label="Compartilhar no WhatsApp">
+              <i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp
+            </button>
+            <button class="art-share-btn" id="shareTwitter" aria-label="Compartilhar no X">
+              <i class="fab fa-x-twitter" aria-hidden="true"></i> X
+            </button>
+            <button class="art-share-btn art-share-copy" id="shareCopy" aria-label="Copiar link">
+              <i class="fas fa-link" aria-hidden="true"></i> Copiar link
+            </button>
+          </div>
+        </div>
+
+        <!-- Autor box -->
+        <div class="art-author-box" id="artAuthorBox">
+          <div class="art-ab-avatar" id="artAbAvatar" aria-hidden="true"></div>
+          <div class="art-ab-info">
+            <span class="art-ab-label">Sobre o autor</span>
+            <span class="art-ab-name" id="artAbName"></span>
+            <p class="art-ab-bio" id="artAbBio"></p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar direita -->
+      <aside class="art-sidebar-right" aria-label="Conteúdo relacionado">
+
+        <!-- Card Dryfour Shopping -->
+        <div class="art-widget art-widget--shop">
+          <div class="art-widget-head">
+            <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+            <span>Dryfour Shopping</span>
+          </div>
+          <p class="art-widget-desc">Hardware, tecnologia e produtos tech com os melhores preços.</p>
+          <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener"
+            class="art-widget-cta" data-track="sidebar-shop">
+            Ver ofertas <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <!-- Card Dryfour Construção -->
+        <div class="art-widget art-widget--build">
+          <div class="art-widget-head">
+            <i class="fas fa-helmet-safety" aria-hidden="true"></i>
+            <span>Dryfour Construção</span>
+          </div>
+          <p class="art-widget-desc">Especialistas em Drywall e Steel Frame no Rio de Janeiro.</p>
+          <a href="https://www.dryfour.com.br" target="_blank" rel="noopener"
+            class="art-widget-cta art-widget-cta--build" data-track="sidebar-build">
+            Solicitar orçamento <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <!-- Newsletter mini -->
+        <div class="art-widget art-widget--nl">
+          <div class="art-widget-head">
+            <i class="fas fa-satellite-dish" aria-hidden="true"></i>
+            <span>Newsletter</span>
+          </div>
+          <p class="art-widget-desc">Receba os melhores conteúdos tech direto no seu e-mail.</p>
+          <form class="art-nl-form" id="artNlForm" novalidate>
+            <input type="email" placeholder="seu@email.com" class="art-nl-input"
+              id="artNlEmail" aria-label="E-mail para newsletter" required>
+            <button type="submit" class="art-widget-cta">
+              Inscrever <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Artigos recentes (carregados via API) -->
+        <div class="art-widget art-widget--related">
+          <div class="art-widget-head">
+            <i class="fas fa-rss" aria-hidden="true"></i>
+            <span>Mais artigos</span>
+          </div>
+          <div id="artRelated" class="art-related-list">
+            <div class="art-skeleton" style="height:60px;border-radius:8px;"></div>
+            <div class="art-skeleton" style="height:60px;border-radius:8px;margin-top:8px;"></div>
+            <div class="art-skeleton" style="height:60px;border-radius:8px;margin-top:8px;"></div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <!-- CTA final -->
+    <div class="art-cta-section">
+      <div class="container art-cta-inner">
+        <div class="art-cta-text">
+          <span class="section-eyebrow">
+            <i class="fas fa-satellite-dish" aria-hidden="true"></i> Dryfour Blog
+          </span>
+          <h2>Gostou do conteúdo?</h2>
+          <p>Acompanhe os melhores conteúdos de tecnologia, construção inteligente e inovação.</p>
+        </div>
+        <div class="art-cta-btns">
+          <a href="/" class="btn-primary">
+            <i class="fas fa-border-all" aria-hidden="true"></i> Ver todos os artigos
+          </a>
+          <a href="https://www.dryfour.com.br" target="_blank" rel="noopener" class="btn-ghost-light">
+            <i class="fas fa-helmet-safety" aria-hidden="true"></i> Dryfour Construção
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </article>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-top container">
+    <div class="footer-brand">
+      <a href="/" class="logo footer-logo" aria-label="Dryfour Blog">
+        DRY<span>FOUR</span> <span class="logo-nexus">BLOG</span>
+      </a>
+      <p>Portal de tecnologia, IA e fronteiras digitais da Dryfour.</p>
+      <div class="social-row" aria-label="Redes sociais">
+        <a href="#" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="X"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>NICHOS</h4>
+      <ul role="list">
+        <li><a href="/?niche=ai">IA &amp; Software</a></li>
+        <li><a href="/?niche=architecture">Arquitetura 3.0</a></li>
+        <li><a href="/?niche=smarthome">Smart Home</a></li>
+        <li><a href="/?niche=hardware">Hardware Extremo</a></li>
+        <li><a href="/?niche=space">Espaço &amp; Ciência</a></li>
+        <li><a href="/?niche=culture">Cultura Sci-Fi</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>BLOG</h4>
+      <ul role="list">
+        <li><a href="#">Sobre o projeto</a></li>
+        <li><a href="#">Política editorial</a></li>
+        <li><a href="#">Política de privacidade</a></li>
+        <li><a href="#">Anuncie conosco</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>DRYFOUR</h4>
+      <ul role="list">
+        <li><a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener">Dryfour Shopping</a></li>
+        <li><a href="https://www.dryfour.com.br" target="_blank" rel="noopener">Dryfour Construção</a></li>
+        <li><a href="mailto:dryfour.ofertas@gmail.com"><i class="fas fa-envelope" aria-hidden="true"></i> dryfour.ofertas@gmail.com</a></li>
+        <li><address><i class="fas fa-phone" aria-hidden="true"></i> (21) 98526-0805</address></li>
+        <li><address><i class="fas fa-map-pin" aria-hidden="true"></i> Rio de Janeiro, RJ</address></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <span>© 2026 Dryfour Blog. Todos os direitos reservados.</span>
+    <span class="footer-legal">
+      <i class="fas fa-circle-info" aria-hidden="true"></i>
+      DRYFOUR DISTRIBUIDORA E EMPREENDIMENTOS LTDA. — CNPJ: 21.211.183/0001-64
+    </span>
+  </div>
+  <div class="footer-credit">
+    <span>Desenvolvido por Felipe de Souza Lima</span>
+  </div>
+</footer>
+
+<div id="toastContainer" role="region" aria-live="polite" aria-label="Notificações"></div>
+<div class="site-overlay" id="siteOverlay" aria-hidden="true"></div>
+
+<script src="assets/artigo.js"></script>
+</body>
+</html>
