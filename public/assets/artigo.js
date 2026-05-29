@@ -131,6 +131,14 @@ async function fetchArticle() {
 }
 
 /* ================================================================
+   INCREMENTA VIEW COUNT (fire and forget)
+   ================================================================ */
+function trackView(id) {
+  // Envia view para a API de forma assíncrona sem bloquear o render
+  fetch(`/api/news/${id}`, { method: 'GET' }).catch(() => {});
+}
+
+/* ================================================================
    BUSCA ARTIGOS RELACIONADOS (mesmo nicho, exclui atual)
    ================================================================ */
 async function fetchRelated(niche, currentId) {
@@ -193,9 +201,9 @@ function renderArticle(art) {
   const authorAvatar = qs('#artAuthorAvatar');
   if (authorAvatar) authorAvatar.textContent = initial;
 
-  // ── Excerpt ──
+  // ── Excerpt — innerHTML permite negrito no banco ──
   const excerptEl = qs('#artExcerpt');
-  if (excerptEl) excerptEl.textContent = art.excerpt || '';
+  if (excerptEl) excerptEl.innerHTML = art.excerpt || '';
 
   // ── Corpo do artigo ──
   const bodyEl = qs('#artBody');
@@ -216,21 +224,40 @@ function renderArticle(art) {
   if (abName)   abName.textContent   = art.author || 'Dryfour Blog Editorial';
   if (abBio)    abBio.textContent    = author.bio;
 
-  // ── Tags (usa o nicho como tag base) ──
+  // ── Tags dinâmicas por nicho ──
+  const nicheTags = {
+    default:      ['Tecnologia', 'Inovação', 'Dryfour Blog'],
+    ai:           ['Inteligência Artificial', 'Machine Learning', 'IA Generativa', 'Tech'],
+    smarthome:    ['Smart Home', 'IoT', 'Automação', 'Casa Inteligente', 'Domótica'],
+    architecture: ['Construção Civil', 'Drywall', 'Steel Frame', 'Arquitetura', 'Engenharia'],
+    hardware:     ['Hardware', 'GPU', 'Processadores', 'Overclocking', 'Tech'],
+    space:        ['Aeroespacial', 'Astronomia', 'NASA', 'Ciência', 'Exploração Espacial'],
+    culture:      ['Sci-Fi', 'Cyberpunk', 'Cultura Tech', 'Futurismo', 'Gaming'],
+    sandbox:      ['Sandbox', 'Ferramentas', 'Protótipos', 'Experimentos', 'Open Source'],
+  };
   const tagsRow = qs('#artTagsRow');
   if (tagsRow) {
-    const tags = [cfg.label, 'Dryfour Blog'];
-    if (art.niche === 'architecture') tags.push('Construção Civil', 'Drywall', 'Steel Frame');
-    if (art.niche === 'ai')           tags.push('Inteligência Artificial', 'Tech');
+    const tags = nicheTags[art.niche] || nicheTags.default;
     tagsRow.innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
   }
 
   // ── Compartilhamento ──
   initShare(art.title);
 
-  // ── Mostra o artigo, esconde loading ──
-  qs('#artLoading').style.display  = 'none';
-  qs('#artMain').style.display     = 'block';
+  // ── Mostra o artigo com animação de entrada ──
+  const loading = qs('#artLoading');
+  const main    = qs('#artMain');
+  if (loading) loading.style.display = 'none';
+  if (main) {
+    main.style.display  = 'block';
+    main.style.opacity  = '0';
+    main.style.transform = 'translateY(12px)';
+    requestAnimationFrame(() => {
+      main.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      main.style.opacity    = '1';
+      main.style.transform  = 'translateY(0)';
+    });
+  }
 }
 
 /* ================================================================
@@ -427,6 +454,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 3. Renderiza o artigo
   renderArticle(art);
+
+  // 3b. Registra a visualização
+  if (art.id) trackView(art.id);
 
   // 4. Carrega artigos relacionados em paralelo
   fetchRelated(art.niche, art.id).then(related => {
