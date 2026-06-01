@@ -31,6 +31,18 @@
       "dest": "/public/assets/$1"
     },
     {
+      "src": "^/artigo\\.html$",
+      "dest": "/public/artigo.html"
+    },
+    {
+      "src": "^/artigo\\.html(\\?.*)?$",
+      "dest": "/public/artigo.html"
+    },
+    {
+      "src": "^/(.*\\.html)$",
+      "dest": "/public/$1"
+    },
+    {
       "src": "^/(.*)",
       "dest": "/public/index.html"
     }
