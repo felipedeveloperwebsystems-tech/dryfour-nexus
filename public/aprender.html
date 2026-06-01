@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" id="eduMetaDesc" content="Dryfour Blog Aprender+ — Educação interativa em múltiplas disciplinas. Português, Inglês, Matemática, Programação, Eletrônica e muito mais.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Dryfour Blog — Aprender+">
+  <meta name="theme-color" content="#F5F7FA">
+  <title id="eduTitle">Dryfour Blog | Aprender+</title>
+
+  <!-- CSS crítico anti-FOUC — sidebar fechado + skeleton -->
+  <style>
+    html, body {
+      background: #F5F7FA; color: #0F172A; margin: 0; padding: 0;
+      font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden;
+    }
+    /* Edu sidebar fechado antes do CSS carregar */
+    .edu-sidebar { transform: translateX(-105%); }
+    .edu-skeleton {
+      background: linear-gradient(90deg, #e8edf5 25%, #f0f4fa 50%, #e8edf5 75%);
+      background-size: 200% 100%; animation: eduShimmer 1.4s ease-in-out infinite;
+      border-radius: 12px;
+    }
+    @keyframes eduShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    /* Accordion fechado antes do CSS carregar */
+    .edu-acc-body { display: grid; grid-template-rows: 0fr; overflow: hidden; }
+    .edu-acc-body > * { overflow: hidden; }
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/aprender.css">
+</head>
+<body class="edu-page niche-default">
+
+<!-- ===== SKIP LINK ===== -->
+<a class="skip-link" href="#eduContent">Ir para o conteúdo educacional</a>
+
+<!-- ===== OVERLAY DO EDU-SIDEBAR (mobile) ===== -->
+<div class="edu-sidebar-overlay" id="eduSidebarOverlay" aria-hidden="true"></div>
+
+<!-- ===== TICKER BAR ===== -->
+<div class="ticker-bar" id="tickerBar" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader" role="banner">
+  <nav class="navbar" aria-label="Navegação principal">
+
+    <!-- Hamburger — abre o edu-sidebar no mobile -->
+    <button
+      class="hamburger-btn edu-ham-btn"
+      id="eduHamBtn"
+      aria-label="Abrir menu de disciplinas"
+      aria-expanded="false"
+      aria-controls="eduSidebar"
+    >
+      <span class="hb-bar"></span>
+      <span class="hb-bar"></span>
+      <span class="hb-bar"></span>
+    </button>
+
+    <!-- Logo -->
+    <a href="/" class="logo" aria-label="Dryfour Blog — Página inicial">
+      DRY<span>FOUR</span> <span class="logo-nexus">BLOG</span>
+    </a>
+
+    <!-- Breadcrumb edu -->
+    <nav class="edu-breadcrumb" aria-label="Localização">
+      <a href="/" class="edu-bc-link"><i class="fas fa-home" aria-hidden="true"></i> Início</a>
+      <i class="fas fa-chevron-right edu-bc-sep" aria-hidden="true"></i>
+      <a href="/aprender.html" class="edu-bc-link edu-bc-active">
+        <i class="fas fa-graduation-cap" aria-hidden="true"></i> Aprender+
+      </a>
+      <i class="fas fa-chevron-right edu-bc-sep" id="eduBcSep2" aria-hidden="true" style="display:none"></i>
+      <span class="edu-bc-subject" id="eduBcSubject" style="display:none"></span>
+    </nav>
+
+    <!-- Nav actions -->
+    <div class="nav-actions">
+      <!-- Badge da disciplina ativa -->
+      <div class="niche-badge" id="nicheBadge" aria-live="polite">
+        <span class="niche-dot" id="nicheDot" aria-hidden="true"></span>
+        <span class="niche-label-badge" id="nicheLabelBadge">APRENDER+</span>
+      </div>
+      <!-- Link de volta ao blog -->
+      <a href="/" class="edu-back-btn" aria-label="Voltar ao portal">
+        <i class="fas fa-newspaper" aria-hidden="true"></i>
+        <span>Portal</span>
+      </a>
+    </div>
+
+  </nav>
+</header>
+
+<!-- ===== LAYOUT PRINCIPAL DA PÁGINA APRENDER+ ===== -->
+<!--
+  ESTRUTURA: chassi de 2 colunas
+  Esquerda: .edu-sidebar (fixo no desktop, drawer no mobile)
+  Direita:  .edu-main (conteúdo da disciplina ativa)
+-->
+<div class="edu-layout" id="eduLayout">
+
+  <!-- ===== EDU-SIDEBAR VERTICAL ===== -->
+  <!--
+    Desktop (≥1024px): fixo à esquerda, sempre visível
+    Mobile (<1024px):  drawer que desliza da esquerda via hamburger
+    Accordion: grid-template-rows:0fr→1fr (mesma técnica do nexus-sidebar)
+    Cada disciplina tem seus próprios grupos e tópicos (via sidebar_json do banco)
+  -->
+  <aside
+    class="edu-sidebar"
+    id="eduSidebar"
+    role="navigation"
+    aria-label="Menu de disciplinas e tópicos"
+    aria-hidden="false"
+  >
+
+    <!-- Cabeçalho do edu-sidebar -->
+    <div class="edu-sb-head">
+      <div class="edu-sb-brand">
+        <i class="fas fa-graduation-cap edu-sb-icon" aria-hidden="true"></i>
+        <div>
+          <span class="edu-sb-title">Aprender+</span>
+          <span class="edu-sb-sub">Dryfour Blog</span>
+        </div>
+      </div>
+      <!-- Botão fechar — apenas no mobile drawer -->
+      <button class="edu-sb-close" id="eduSbClose" aria-label="Fechar menu de disciplinas">
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Search dentro do sidebar -->
+    <div class="edu-sb-search">
+      <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+      <input
+        type="search"
+        id="eduSbSearch"
+        placeholder="Buscar tópico…"
+        autocomplete="off"
+        aria-label="Buscar tópico educacional"
+      >
+      <button class="edu-sb-search-clear" id="eduSbSearchClear" aria-label="Limpar" style="display:none">
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Lista de disciplinas — gerada dinamicamente pelo JS -->
+    <!--
+      Estrutura HTML gerada pelo JS para cada disciplina:
+      .edu-discipline-item[data-subject="matematica"]
+        button.edu-disc-header[aria-expanded="false"]
+          .edu-disc-icon  ← cor e ícone da disciplina
+          .edu-disc-name
+          i.edu-disc-arrow
+        .edu-disc-groups (accordion body — grid-template-rows)
+          .edu-disc-body (inner wrapper para o grid trick)
+            .edu-group-item
+              button.edu-group-header[aria-expanded="false"]
+                i.fa-chevron-right
+                span (nome do grupo)
+              .edu-group-topics (accordion body)
+                .edu-group-body
+                  button.edu-topic-btn[data-topic="..."]
+                    i.fa-circle-dot
+                    span
+    -->
+    <nav class="edu-sb-nav" id="eduSbNav" aria-label="Disciplinas e tópicos">
+      <!-- Renderizado pelo EduSidebarModule.render() -->
+      <div class="edu-sk-list">
+        <div class="edu-skeleton" style="height:44px;border-radius:10px;"></div>
+        <div class="edu-skeleton" style="height:44px;border-radius:10px;margin-top:8px;"></div>
+        <div class="edu-skeleton" style="height:44px;border-radius:10px;margin-top:8px;"></div>
+        <div class="edu-skeleton" style="height:44px;border-radius:10px;margin-top:8px;"></div>
+        <div class="edu-skeleton" style="height:44px;border-radius:10px;margin-top:8px;"></div>
+      </div>
+    </nav>
+
+    <!-- Rodapé do sidebar -->
+    <div class="edu-sb-foot">
+      <a href="/" class="edu-sb-foot-link">
+        <i class="fas fa-newspaper" aria-hidden="true"></i>
+        <div>
+          <span class="edu-sbf-title">Portal de Notícias</span>
+          <span class="edu-sbf-sub">Voltar ao blog principal</span>
+        </div>
+        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+      </a>
+      <a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener" class="edu-sb-foot-link">
+        <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+        <div>
+          <span class="edu-sbf-title">Dryfour Shopping</span>
+          <span class="edu-sbf-sub">Livros, cursos e materiais</span>
+        </div>
+        <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+      </a>
+    </div>
+
+  </aside>
+  <!-- /edu-sidebar -->
+
+  <!-- ===== ÁREA DE CONTEÚDO PRINCIPAL ===== -->
+  <main class="edu-main" id="eduContent">
+
+    <!-- Estado inicial: seleção de disciplina -->
+    <div class="edu-welcome" id="eduWelcome">
+      <div class="edu-welcome-inner">
+        <div class="edu-welcome-icon" aria-hidden="true">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h1 class="edu-welcome-title">Escolha uma disciplina</h1>
+        <p class="edu-welcome-sub">Selecione no menu ao lado a matéria que deseja estudar. O conteúdo carrega aqui com cores e ferramentas específicas para cada área.</p>
+
+        <!-- Grid de seleção rápida de disciplinas -->
+        <div class="edu-quick-grid" id="eduQuickGrid">
+          <!-- Renderizado pelo JS com os subjects do banco -->
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+          <div class="edu-skeleton" style="height:100px;border-radius:14px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado de conteúdo de tópico -->
+    <div class="edu-content-view" id="eduContentView" style="display:none">
+
+      <!-- Cabeçalho do conteúdo -->
+      <div class="edu-content-head">
+        <div class="edu-content-meta" id="eduContentMeta">
+          <span class="edu-content-subject" id="eduContentSubject"></span>
+          <span class="edu-content-group" id="eduContentGroup"></span>
+          <span class="edu-content-diff" id="eduContentDiff"></span>
+          <span class="edu-content-dur" id="eduContentDur">
+            <i class="fas fa-clock" aria-hidden="true"></i> <span id="eduDurMin"></span> min
+          </span>
+        </div>
+        <h1 class="edu-content-title" id="eduContentTitle"></h1>
+        <p class="edu-content-summary" id="eduContentSummary"></p>
+        <!-- Barra de progresso do tópico -->
+        <div class="edu-progress-bar" aria-hidden="true">
+          <div class="edu-progress-fill" id="eduProgressFill"></div>
+        </div>
+      </div>
+
+      <!-- Corpo do conteúdo educacional -->
+      <div class="edu-body" id="eduBody"></div>
+
+      <!-- AdSense mid-content -->
+      <div class="edu-adsense">
+        <div class="edu-ad-label"><i class="fas fa-circle-info" aria-hidden="true"></i> Publicidade</div>
+        <div class="edu-ad-placeholder">
+          <i class="fas fa-rectangle-ad" aria-hidden="true"></i>
+          <span>Google AdSense — 728×90</span>
+          <span class="edu-ad-note">Cole seu código AdSense aqui</span>
+        </div>
+      </div>
+
+      <!-- Card de afiliado contextual (muda por disciplina) -->
+      <div class="edu-affiliate-card" id="eduAffiliateCard">
+        <!-- Renderizado pelo JS baseado na disciplina ativa -->
+      </div>
+
+      <!-- Navegação entre tópicos -->
+      <div class="edu-topic-nav" id="eduTopicNav">
+        <button class="edu-nav-btn" id="eduPrevTopic" aria-label="Tópico anterior">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          <span>Anterior</span>
+        </button>
+        <div class="edu-topic-dots" id="eduTopicDots"></div>
+        <button class="edu-nav-btn edu-nav-btn--next" id="eduNextTopic" aria-label="Próximo tópico">
+          <span>Próximo</span>
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- AdSense bottom -->
+      <div class="edu-adsense">
+        <div class="edu-ad-label"><i class="fas fa-circle-info" aria-hidden="true"></i> Publicidade</div>
+        <div class="edu-ad-placeholder">
+          <i class="fas fa-rectangle-ad" aria-hidden="true"></i>
+          <span>Google AdSense — 728×90</span>
+          <span class="edu-ad-note">Cole seu código AdSense aqui</span>
+        </div>
+      </div>
+
+    </div>
+    <!-- /edu-content-view -->
+
+  </main>
+  <!-- /edu-main -->
+
+</div>
+<!-- /edu-layout -->
+
+<!-- ===== FOOTER (mesmo do index.html) ===== -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-top container">
+    <div class="footer-brand">
+      <a href="/" class="logo footer-logo" aria-label="Dryfour Blog">
+        DRY<span>FOUR</span> <span class="logo-nexus">BLOG</span>
+      </a>
+      <p>Portal de tecnologia, IA e fronteiras digitais da Dryfour. Informação densa. Futuro afiado.</p>
+      <div class="social-row" aria-label="Redes sociais">
+        <a href="#" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="X"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
+        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>APRENDER+</h4>
+      <ul role="list">
+        <li><a href="/aprender.html?subject=portugues">Português</a></li>
+        <li><a href="/aprender.html?subject=ingles">Inglês</a></li>
+        <li><a href="/aprender.html?subject=matematica">Matemática</a></li>
+        <li><a href="/aprender.html?subject=programacao">Programação</a></li>
+        <li><a href="/aprender.html?subject=fisica">Física</a></li>
+        <li><a href="/aprender.html?subject=eletronica">Eletrônica</a></li>
+        <li><a href="/aprender.html?subject=hobbies">Hobbies</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>BLOG</h4>
+      <ul role="list">
+        <li><a href="/?niche=ai">IA &amp; Software</a></li>
+        <li><a href="/?niche=architecture">Arquitetura</a></li>
+        <li><a href="/?niche=smarthome">Smart Home</a></li>
+        <li><a href="/?niche=hardware">Hardware</a></li>
+        <li><a href="/?niche=space">Espaço &amp; Ciência</a></li>
+        <li><a href="/?niche=culture">Cultura Sci-Fi</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>DRYFOUR</h4>
+      <ul role="list">
+        <li><a href="https://www.dryfourshopping.com.br" target="_blank" rel="noopener">Dryfour Shopping</a></li>
+        <li><a href="https://www.dryfour.com.br" target="_blank" rel="noopener">Dryfour Construção</a></li>
+        <li><a href="mailto:dryfour.ofertas@gmail.com"><i class="fas fa-envelope" aria-hidden="true"></i> dryfour.ofertas@gmail.com</a></li>
+        <li><address><i class="fas fa-phone" aria-hidden="true"></i> (21) 98526-0805</address></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <span>© 2026 Dryfour Blog. Todos os direitos reservados.</span>
+    <span class="footer-legal">
+      <i class="fas fa-circle-info" aria-hidden="true"></i>
+      DRYFOUR DISTRIBUIDORA E EMPREENDIMENTOS LTDA. — CNPJ: 21.211.183/0001-64
+    </span>
+  </div>
+  <div class="footer-credit">
+    <span>Desenvolvido por Felipe de Souza Lima</span>
+  </div>
+</footer>
+
+<!-- Toast notifications -->
+<div id="toastContainer" role="region" aria-live="polite" aria-label="Notificações"></div>
+
+<script src="assets/aprender.js"></script>
+</body>
+</html>

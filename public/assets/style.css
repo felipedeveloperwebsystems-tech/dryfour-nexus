@@ -1978,3 +1978,64 @@ input, select, textarea { font-family: var(--font-b); }
     top: auto; bottom: 0; left: 0; transform: none;
   }
 }
+
+/* ===================================================================
+   NAV LINK — Aprender+ (destaque especial no menu principal)
+   =================================================================== */
+.nav-link--edu {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  border-radius: var(--r-sm);
+  padding: 4px 12px !important;
+  color: var(--accent-text) !important;
+  font-weight: 600;
+  transition: all var(--t) var(--ease), background var(--t-theme), border-color var(--t-theme);
+}
+.nav-link--edu:hover {
+  background: var(--accent);
+  color: #fff !important;
+  border-color: var(--accent);
+}
+.nav-link--edu i { font-size: 11px; }
+
+/* ===================================================================
+   SIDEBAR — Link especial Aprender+
+   =================================================================== */
+.sidebar-edu-link-wrap {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  background: var(--accent-dim);
+  transition: background var(--t-theme);
+}
+.sidebar-edu-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: var(--r);
+  border: 1px solid var(--accent-mid);
+  background: var(--bg-surface);
+  transition: all var(--t) var(--ease), border-color var(--t-theme);
+  text-decoration: none;
+}
+.sidebar-edu-link:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.sidebar-edu-link:hover * { color: #fff !important; }
+.sidebar-edu-icon {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  transition: background var(--t-theme);
+}
+.sidebar-edu-link:hover .sidebar-edu-icon { background: rgba(255,255,255,0.25); }
+.sidebar-edu-title {
+  display: block; font-family: var(--font-d); font-size: 16px;
+  color: var(--text); letter-spacing: 0.3px;
+}
+.sidebar-edu-sub {
+  display: block; font-size: 11px; color: var(--text-dim);
+  margin-top: 2px;
+}
+.sidebar-edu-link > i:last-child { font-size: 11px; color: var(--text-dim); margin-left: auto; }

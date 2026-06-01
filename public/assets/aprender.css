@@ -1,0 +1,601 @@
+/* ============================================================
+   DRYFOUR BLOG — aprender.css
+   Página educacional Aprender+
+   Sidebar vertical profissional desktop + mobile drawer
+   Temas dinâmicos por disciplina via body.niche-*
+   Usa tokens de style.css — zero duplicação
+   ============================================================ */
+
+/* ===================================================================
+   LAYOUT GERAL DA PÁGINA EDUCACIONAL
+   Dois modos:
+   Desktop (≥1024px): sidebar fixo à esquerda + conteúdo à direita
+   Mobile (<1024px):  sidebar como drawer (overlay) + conteúdo full width
+   =================================================================== */
+.edu-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.edu-layout {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - var(--header-h) - var(--ticker-h));
+  position: relative;
+}
+
+/* ===================================================================
+   EDU-SIDEBAR — VERSÃO DESKTOP (≥1024px)
+   Fixo à esquerda, sempre visível, não afeta o scroll do conteúdo.
+   Usa will-change:transform para GPU layer (backdrop-filter 60fps).
+   =================================================================== */
+.edu-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  height: calc(100vh - var(--header-h) - var(--ticker-h));
+  position: sticky;
+  top: calc(var(--header-h) + var(--ticker-h));
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform var(--t) var(--ease), box-shadow var(--t);
+  will-change: transform;
+  z-index: 500;
+}
+
+/* ===================================================================
+   EDU-SIDEBAR — CABEÇALHO
+   =================================================================== */
+.edu-sb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--border2);
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  position: relative;
+}
+.edu-sb-head::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 10%; width: 80%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6; transition: background var(--t-theme);
+}
+.edu-sb-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.edu-sb-icon {
+  font-size: 20px; color: var(--accent-text);
+  transition: color var(--t-theme);
+}
+.edu-sb-title {
+  display: block; font-family: var(--font-d);
+  font-size: 18px; color: var(--text); line-height: 1;
+  letter-spacing: 0.5px;
+}
+.edu-sb-sub {
+  display: block; font-family: var(--font-m);
+  font-size: 9px; color: var(--text-dim);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 3px;
+}
+.edu-sb-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg2); border: 1px solid var(--border2);
+  color: var(--text-mid); font-size: 14px;
+  transition: all var(--t) var(--ease);
+  /* Oculto no desktop — visível apenas no mobile */
+  display: none;
+}
+.edu-sb-close:hover {
+  color: var(--accent-text); background: var(--accent-dim);
+  border-color: var(--accent-mid); transform: rotate(90deg);
+}
+
+/* ===================================================================
+   EDU-SIDEBAR — SEARCH
+   =================================================================== */
+.edu-sb-search {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
+  background: var(--bg2); flex-shrink: 0;
+}
+.edu-sb-search i { color: var(--accent-text); font-size: 12px; flex-shrink: 0; transition: color var(--t-theme); }
+#eduSbSearch {
+  flex: 1; min-width: 0; border: none; outline: none;
+  background: transparent; font-size: 13px; color: var(--text);
+}
+#eduSbSearch::placeholder { color: var(--text-dim); }
+.edu-sb-search-clear {
+  color: var(--text-dim); padding: 3px; font-size: 12px;
+  transition: color var(--t); flex-shrink: 0;
+}
+.edu-sb-search-clear:hover { color: var(--text); }
+
+/* ===================================================================
+   EDU-SIDEBAR — NAVEGAÇÃO (scrollável)
+   =================================================================== */
+.edu-sb-nav {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 8px 0 12px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-mid) transparent;
+}
+.edu-sb-nav::-webkit-scrollbar { width: 3px; }
+.edu-sb-nav::-webkit-scrollbar-thumb { background: var(--accent-mid); border-radius: 3px; }
+
+/* ===================================================================
+   DISCIPLINAS — ACCORDION NÍVEL 1
+   Cada disciplina é um item do accordion principal
+   =================================================================== */
+.edu-discipline-item {
+  border-bottom: 1px solid var(--border2);
+}
+
+/* Header da disciplina (clicável) */
+.edu-disc-header {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; text-align: left; font-size: 13px; font-weight: 500;
+  color: var(--text-mid); background: transparent;
+  transition: all var(--t) var(--ease); user-select: none;
+}
+.edu-disc-header:hover {
+  background: linear-gradient(90deg, var(--accent-dim), transparent);
+  color: var(--accent-text);
+}
+.edu-disc-header.active-disc {
+  background: linear-gradient(90deg, var(--accent-mid), transparent);
+  color: var(--accent-text);
+}
+.edu-disc-header[aria-expanded="true"] {
+  background: linear-gradient(90deg, var(--accent-dim), transparent);
+  color: var(--accent-text);
+}
+.edu-disc-header[aria-expanded="true"] .edu-disc-arrow {
+  transform: rotate(90deg);
+  color: var(--accent-text);
+}
+
+/* Ícone da disciplina — cor muda por tema */
+.edu-disc-icon {
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0; color: #fff;
+  transition: box-shadow var(--t);
+}
+.edu-disc-header:hover .edu-disc-icon,
+.edu-disc-header[aria-expanded="true"] .edu-disc-icon {
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* Cores dos ícones por disciplina */
+.disc-portugues   { background: #FF00C8; }
+.disc-ingles      { background: #0049FF; }
+.disc-espanhol    { background: #00c9ad; }
+.disc-alemao      { background: #FF0055; }
+.disc-matematica  { background: #FF9F1C; }
+.disc-fisica      { background: #7A00FF; }
+.disc-quimica     { background: #00cc52; }
+.disc-programacao { background: #7A00FF; }
+.disc-eletronica  { background: #FF0055; }
+.disc-hobbies     { background: #FF00C8; }
+
+.edu-disc-name { flex: 1; }
+.edu-disc-arrow {
+  font-size: 10px; color: var(--text-dim); flex-shrink: 0;
+  transition: transform var(--t) var(--ease), color var(--t);
+}
+
+/* Corpo do accordion da disciplina */
+.edu-disc-groups {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows var(--t) var(--ease);
+  overflow: hidden; background: var(--bg2);
+}
+.edu-disc-groups > * { overflow: hidden; }
+.edu-disc-groups.open { grid-template-rows: 1fr; }
+.edu-disc-body { display: flex; flex-direction: column; }
+
+/* ===================================================================
+   GRUPOS — ACCORDION NÍVEL 2
+   Dentro de cada disciplina há grupos (ex: Básico, Intermediário)
+   =================================================================== */
+.edu-group-item {
+  border-bottom: 1px solid rgba(15,23,42,0.06);
+}
+.edu-group-item:last-child { border-bottom: none; }
+
+.edu-group-header {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px 9px 42px; /* indent: 16(pad) + 26(icon) */
+  font-size: 12px; font-weight: 600; color: var(--text-mid);
+  background: transparent; text-align: left;
+  transition: all var(--t);
+  font-family: var(--font-m); text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.edu-group-header:hover { color: var(--accent-text); background: var(--accent-dim); }
+.edu-group-header[aria-expanded="true"] { color: var(--accent-text); }
+.edu-group-header i { font-size: 9px; transition: transform var(--t); flex-shrink: 0; }
+.edu-group-header[aria-expanded="true"] i { transform: rotate(90deg); }
+
+/* Corpo do grupo (tópicos) */
+.edu-group-topics {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows var(--t) var(--ease);
+  overflow: hidden;
+}
+.edu-group-topics > * { overflow: hidden; }
+.edu-group-topics.open { grid-template-rows: 1fr; }
+.edu-group-body { display: flex; flex-direction: column; padding: 4px 0 6px; }
+
+/* Botões de tópico */
+.edu-topic-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 16px 8px 58px; /* indent maior: 16+28+14 */
+  font-size: 12.5px; color: var(--text-mid);
+  background: transparent; text-align: left; width: 100%;
+  transition: all var(--t); border-left: 2px solid transparent;
+}
+.edu-topic-btn:hover {
+  color: var(--accent-text); background: var(--accent-dim);
+  border-left-color: var(--accent); transform: translateX(3px);
+}
+.edu-topic-btn.active-topic {
+  color: var(--accent-text); background: var(--accent-dim);
+  border-left-color: var(--accent); font-weight: 600;
+}
+.edu-topic-btn i { font-size: 7px; color: var(--accent-text); flex-shrink: 0; transition: color var(--t-theme); }
+
+/* ===================================================================
+   EDU-SIDEBAR — RODAPÉ
+   =================================================================== */
+.edu-sb-foot {
+  padding: 10px 14px 14px; border-top: 1px solid var(--border2);
+  display: flex; flex-direction: column; gap: 6px;
+  flex-shrink: 0; background: var(--bg-surface);
+}
+.edu-sb-foot-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--r);
+  border: 1px solid var(--border2); background: var(--bg2);
+  transition: all var(--t) var(--ease); text-decoration: none;
+}
+.edu-sb-foot-link:hover { border-color: var(--accent-mid); background: var(--accent-dim); }
+.edu-sb-foot-link > i:first-child { font-size: 16px; color: var(--accent-text); flex-shrink: 0; transition: color var(--t-theme); }
+.edu-sbf-title { display: block; font-size: 12px; font-weight: 600; color: var(--text); }
+.edu-sbf-sub   { display: block; font-size: 10px; color: var(--text-dim); }
+.edu-sb-foot-link > i:last-child { font-size: 10px; color: var(--text-dim); margin-left: auto; }
+
+/* ===================================================================
+   OVERLAY DO EDU-SIDEBAR (mobile)
+   =================================================================== */
+.edu-sidebar-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.35);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 499;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--t) var(--ease);
+}
+.edu-sidebar-overlay.active { opacity: 1; pointer-events: all; }
+
+/* ===================================================================
+   ÁREA DE CONTEÚDO PRINCIPAL
+   =================================================================== */
+.edu-main {
+  flex: 1; min-width: 0; overflow-x: hidden;
+  padding: 32px 40px 48px;
+  background: var(--bg);
+  transition: background var(--t-theme);
+}
+
+/* ===================================================================
+   ESTADO DE BOAS-VINDAS (seleção de disciplina)
+   =================================================================== */
+.edu-welcome { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+.edu-welcome-inner { max-width: 720px; width: 100%; text-align: center; }
+.edu-welcome-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--accent-dim); border: 2px solid var(--accent-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: var(--accent-text);
+  margin: 0 auto 24px; transition: all var(--t-theme);
+}
+.edu-welcome-title {
+  font-family: var(--font-d); font-size: clamp(28px, 4vw, 48px);
+  color: var(--text); margin-bottom: 12px; letter-spacing: 0.5px;
+}
+.edu-welcome-sub { font-size: 15px; color: var(--text-mid); margin-bottom: 36px; line-height: 1.7; }
+
+/* Grid de seleção rápida */
+.edu-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+.edu-quick-card {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 14px; border-radius: var(--r-lg);
+  background: var(--bg-surface); border: 1px solid var(--border2);
+  cursor: pointer; text-decoration: none;
+  transition: all var(--t) var(--ease);
+}
+.edu-quick-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-mid);
+  box-shadow: var(--shadow-md), var(--accent-glow);
+}
+.edu-quick-icon {
+  width: 48px; height: 48px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #fff;
+  transition: transform var(--t);
+}
+.edu-quick-card:hover .edu-quick-icon { transform: scale(1.1); }
+.edu-quick-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  text-align: center;
+}
+
+/* ===================================================================
+   CABEÇALHO DO CONTEÚDO
+   =================================================================== */
+.edu-content-head {
+  margin-bottom: 32px; padding-bottom: 24px;
+  border-bottom: 1px solid var(--border2);
+}
+.edu-content-meta {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 14px; font-family: var(--font-m); font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+}
+.edu-content-subject {
+  background: var(--accent-dim); color: var(--accent-text);
+  border: 1px solid var(--accent-mid); padding: 3px 10px; border-radius: 4px;
+  transition: all var(--t-theme);
+}
+.edu-content-diff {
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 9px; font-weight: 700;
+}
+.edu-content-diff--iniciante  { background: rgba(0,201,173,0.15); color: #00c9ad; border: 1px solid rgba(0,201,173,0.3); }
+.edu-content-diff--intermediario { background: rgba(255,159,28,0.15); color: #cc7d00; border: 1px solid rgba(255,159,28,0.3); }
+.edu-content-diff--avancado   { background: rgba(255,0,85,0.15); color: #cc0044; border: 1px solid rgba(255,0,85,0.3); }
+.edu-content-dur { display: flex; align-items: center; gap: 5px; }
+
+.edu-content-title {
+  font-family: var(--font-d);
+  font-size: clamp(24px, 3vw, 40px);
+  color: var(--text); margin-bottom: 10px; line-height: 1.1;
+}
+.edu-content-summary {
+  font-size: 16px; color: var(--text-mid); line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+/* Barra de progresso de leitura */
+.edu-progress-bar {
+  height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden;
+}
+.edu-progress-fill {
+  height: 100%; width: 0%; background: var(--accent); border-radius: 2px;
+  transition: width 0.1s linear, background var(--t-theme);
+}
+
+/* ===================================================================
+   CORPO DO CONTEÚDO EDUCACIONAL
+   =================================================================== */
+.edu-body {
+  font-size: 16px; color: var(--text); line-height: 1.9; margin-bottom: 40px;
+}
+.edu-body p { margin-bottom: 20px; }
+.edu-body h2 {
+  font-family: var(--font-d); font-size: clamp(20px, 2.5vw, 30px);
+  color: var(--text); margin: 40px 0 16px;
+  border-bottom: 2px solid var(--accent); padding-bottom: 10px;
+  transition: border-color var(--t-theme);
+}
+.edu-body h3 {
+  font-family: var(--font-d); font-size: clamp(16px, 2vw, 22px);
+  color: var(--text); margin: 30px 0 10px;
+  border-left: 3px solid var(--accent); padding-left: 12px;
+  transition: border-color var(--t-theme);
+}
+.edu-body ul { padding-left: 24px; margin-bottom: 20px; list-style: disc; }
+.edu-body ol { padding-left: 24px; margin-bottom: 20px; list-style: decimal; }
+.edu-body li { margin-bottom: 9px; line-height: 1.7; }
+.edu-body strong { font-weight: 700; color: var(--text); }
+.edu-body em { font-style: italic; color: var(--text-mid); }
+.edu-body code {
+  font-family: var(--font-m); background: var(--bg2);
+  padding: 2px 7px; border-radius: 4px; font-size: 13px; color: var(--accent-text);
+  transition: background var(--t-theme), color var(--t-theme);
+}
+.edu-body pre {
+  background: var(--text); color: #e2e8f0;
+  padding: 20px 24px; border-radius: var(--r); overflow-x: auto;
+  margin-bottom: 24px; font-family: var(--font-m); font-size: 13px; line-height: 1.7;
+}
+.edu-body pre code { background: none; padding: 0; color: inherit; }
+.edu-body blockquote {
+  border-left: 4px solid var(--accent); padding: 16px 20px;
+  background: var(--bg2); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  margin: 24px 0; color: var(--text-mid); font-style: italic;
+  transition: border-color var(--t-theme), background var(--t-theme);
+}
+
+/* ===================================================================
+   CARD DE AFILIADO CONTEXTUAL
+   =================================================================== */
+.edu-affiliate-card {
+  margin: 36px 0; border-radius: var(--r-lg); overflow: hidden;
+  border: 1px solid var(--border2); box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t), transform var(--t);
+}
+.edu-affiliate-card:empty { display: none; }
+.edu-affiliate-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+/* ===================================================================
+   ZONAS ADSENSE
+   =================================================================== */
+.edu-adsense {
+  margin: 36px 0; border-radius: var(--r);
+  border: 1px dashed var(--border2); background: var(--bg2); overflow: hidden;
+}
+.edu-ad-label {
+  padding: 6px 14px; font-family: var(--font-m); font-size: 9px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+  background: var(--bg3); border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 6px;
+}
+.edu-ad-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 24px; text-align: center; color: var(--text-dim);
+}
+.edu-ad-placeholder i { font-size: 24px; opacity: 0.4; }
+.edu-ad-placeholder span { font-size: 13px; font-family: var(--font-m); }
+.edu-ad-note { font-size: 11px; opacity: 0.6; }
+
+/* ===================================================================
+   NAVEGAÇÃO ENTRE TÓPICOS
+   =================================================================== */
+.edu-topic-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 0; border-top: 1px solid var(--border2);
+  margin-top: 16px; gap: 12px;
+}
+.edu-nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg2);
+  transition: all var(--t) var(--ease);
+}
+.edu-nav-btn:hover { border-color: var(--accent-mid); color: var(--accent-text); background: var(--accent-dim); }
+.edu-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.edu-nav-btn--next { background: var(--accent); color: #fff; border-color: transparent; }
+.edu-nav-btn--next:hover { filter: brightness(1.1); }
+.edu-nav-btn--next:disabled { background: var(--bg3); color: var(--text-dim); }
+.edu-topic-dots { display: flex; gap: 6px; }
+.edu-topic-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border2);
+  cursor: pointer; transition: all var(--t);
+}
+.edu-topic-dot.active { background: var(--accent); border-color: var(--accent); }
+
+/* ===================================================================
+   HEADER — BREADCRUMB DA PÁGINA APRENDER+
+   =================================================================== */
+.edu-breadcrumb {
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  overflow: hidden; font-size: 12px; font-family: var(--font-m);
+  padding: 0 8px; letter-spacing: 0.5px;
+}
+.edu-bc-link {
+  color: var(--accent-text); white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+  transition: color var(--t); font-size: 12px;
+}
+.edu-bc-link:hover { color: var(--accent); }
+.edu-bc-active { font-weight: 600; }
+.edu-bc-sep { font-size: 9px; color: var(--text-dim); flex-shrink: 0; }
+.edu-bc-subject { color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Botão de volta ao portal */
+.edu-back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border2); color: var(--text-mid);
+  background: var(--bg2); transition: all var(--t); white-space: nowrap;
+}
+.edu-back-btn:hover { border-color: var(--accent-mid); color: var(--accent-text); background: var(--accent-dim); }
+
+/* Botão hamburger adaptado para edu */
+.edu-ham-btn { display: none; } /* Oculto no desktop */
+
+/* Skeletons */
+.edu-sk-list { padding: 8px 12px; display: flex; flex-direction: column; gap: 8px; }
+.edu-skeleton {
+  background: linear-gradient(90deg, #e8edf5 25%, #f0f4fa 50%, #e8edf5 75%);
+  background-size: 200% 100%; animation: eduShimmer 1.4s ease-in-out infinite;
+  border-radius: var(--r);
+}
+@keyframes eduShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ===================================================================
+   RESPONSIVE — 1280px
+   =================================================================== */
+@media (max-width: 1280px) {
+  .edu-sidebar { width: 260px; }
+  .edu-main { padding: 28px 32px 40px; }
+}
+
+/* ===================================================================
+   RESPONSIVE — 1024px (sidebar vira drawer)
+   Aqui acontece a grande mudança: sidebar fixo → mobile drawer
+   =================================================================== */
+@media (max-width: 1024px) {
+  .edu-layout { display: block; }
+
+  /* Sidebar: sai do fluxo e vira drawer deslizante */
+  .edu-sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: min(300px, 90vw);
+    height: 100dvh;
+    transform: translateX(-105%);
+    box-shadow: var(--shadow-lg);
+    z-index: 500;
+    transition: transform var(--t) var(--ease);
+  }
+  .edu-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Botão fechar — visível no mobile */
+  .edu-sb-close { display: flex; }
+
+  /* Hamburger — visível no mobile */
+  .edu-ham-btn { display: flex; }
+
+  /* Breadcrumb — esconde no mobile */
+  .edu-breadcrumb { display: none; }
+
+  /* Conteúdo ocupa tela toda */
+  .edu-main { padding: 24px 20px 36px; }
+
+  /* Quick grid: 2 colunas */
+  .edu-quick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===================================================================
+   RESPONSIVE — 768px
+   =================================================================== */
+@media (max-width: 768px) {
+  .edu-main { padding: 20px 16px 32px; }
+  .edu-welcome-icon { width: 64px; height: 64px; font-size: 26px; }
+  .edu-content-title { font-size: 22px; }
+  .edu-body { font-size: 15px; }
+  .edu-topic-nav { flex-wrap: wrap; }
+  .edu-nav-btn { flex: 1; justify-content: center; }
+  .edu-topic-dots { order: -1; flex: 100%; justify-content: center; }
+}
+
+/* ===================================================================
+   RESPONSIVE — 480px
+   =================================================================== */
+@media (max-width: 480px) {
+  .edu-quick-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .edu-quick-card { padding: 16px 10px; }
+  .edu-quick-name { font-size: 12px; }
+}

@@ -209,6 +209,7 @@ const TICKER_ITEMS = [
   { icon:'fas fa-shield-alt',    text:'Vulnerabilidade crítica em câmeras IoT: atualize o firmware' },
   { icon:'fas fa-infinity',      text:'Manifesto Cyberpunk 2026: a estética que dominou o design da IA' },
   { icon:'fas fa-atom',          text:'IBM lança chip quântico de 1000 qubits para uso comercial' },
+  { icon:'fas fa-graduation-cap', text:'Aprender+ — Matemática, Inglês, Programação e muito mais agora no Dryfour Blog' },
 ];
 
 /* ================================================================

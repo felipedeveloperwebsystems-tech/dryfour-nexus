@@ -31,15 +31,15 @@
       "dest": "/public/assets/$1"
     },
     {
-      "src": "^/artigo\\.html$",
-      "dest": "/public/artigo.html"
-    },
-    {
       "src": "^/artigo\\.html(\\?.*)?$",
       "dest": "/public/artigo.html"
     },
     {
-      "src": "^/(.*\\.html)$",
+      "src": "^/aprender\\.html(\\?.*)?$",
+      "dest": "/public/aprender.html"
+    },
+    {
+      "src": "^/(.*\\.html)(\\?.*)?$",
       "dest": "/public/$1"
     },
     {
