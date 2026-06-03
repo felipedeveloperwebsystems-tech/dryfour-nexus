@@ -9,15 +9,23 @@
   <meta name="theme-color" content="#F5F7FA">
   <title id="eduTitle">Dryfour Blog | Aprender+</title>
 
-  <!-- CSS crítico anti-FOUC — sidebar fechado + skeleton -->
+  <!-- CSS crítico anti-FOUC -->
   <style>
     html, body {
       background: #F5F7FA; color: #0F172A; margin: 0; padding: 0;
       font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden;
     }
-    /* Edu sidebar — fechado antes do CSS carregar APENAS no mobile */
+    /*
+      REGRA DO SIDEBAR:
+      Desktop (≥1025px): SEMPRE visível — sem transform.
+      Mobile  (≤1024px): SEMPRE fechado por padrão — transform negativo.
+      O JS abre/fecha adicionando/removendo a classe .open no mobile.
+    */
+    .edu-sidebar { transform: translateX(0); } /* desktop: visível */
     @media (max-width: 1024px) {
-      .edu-sidebar { transform: translateX(-105%); }
+      /* mobile: fechado até o JS adicionar .open */
+      .edu-sidebar { transform: translateX(-110%) !important; }
+      .edu-sidebar.open { transform: translateX(0) !important; }
     }
     .edu-skeleton {
       background: linear-gradient(90deg, #e8edf5 25%, #f0f4fa 50%, #e8edf5 75%);
@@ -25,7 +33,6 @@
       border-radius: 12px;
     }
     @keyframes eduShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    /* Accordion fechado antes do CSS carregar */
     .edu-acc-body { display: grid; grid-template-rows: 0fr; overflow: hidden; }
     .edu-acc-body > * { overflow: hidden; }
   </style>

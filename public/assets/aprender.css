@@ -43,11 +43,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: transform var(--t) var(--ease), box-shadow var(--t);
+  /* Transição só para o transform — performance GPU */
+  transition: transform 0.32s cubic-bezier(0.2,0.9,0.4,1), box-shadow var(--t);
   will-change: transform;
   z-index: 500;
-  /* DESKTOP ≥1025px: sempre visível, transform zerado */
-  transform: translateX(0);
 }
 
 /* ===================================================================
@@ -549,23 +548,23 @@
 @media (max-width: 1024px) {
   .edu-layout { display: block; }
 
-  /* Sidebar: sai do fluxo → drawer fechado por padrão */
+  /*
+    Mobile sidebar: sai do fluxo normal e se torna um drawer.
+    O transform é controlado pelo CSS crítico inline no <head>
+    (transform: translateX(-110%) !important por padrão).
+    O JS adiciona .open para mostrar: translateX(0) !important.
+    Aqui só definimos posição, tamanho e z-index.
+  */
   .edu-sidebar {
     position: fixed;
     top: 0; left: 0;
     width: min(300px, 90vw);
     height: 100dvh;
-    /* Fechado: fora da tela à esquerda */
-    transform: translateX(-105%) !important;
-    box-shadow: var(--shadow-lg);
+    box-shadow: none;
     z-index: 600;
-    transition: transform 0.32s cubic-bezier(0.2,0.9,0.4,1);
   }
-
-  /* Aberto via JS: adiciona .open */
   .edu-sidebar.open {
-    transform: translateX(0) !important;
-    box-shadow: 4px 0 40px rgba(0,0,0,0.18);
+    box-shadow: 6px 0 48px rgba(0,0,0,0.18);
   }
 
   /* Botão fechar — visível no mobile */
@@ -769,4 +768,115 @@
   .edu-math-card-header { padding: 14px 16px; }
   .edu-math-inputs { padding: 16px; }
   .edu-math-visual { padding: 16px; }
+}
+
+/* ===================================================================
+   CALCULADORAS MATEMÁTICAS — adaptação do gemini-code ao design Dryfour
+   =================================================================== */
+.edu-method-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t);
+}
+.edu-method-card:hover { box-shadow: var(--shadow-md); }
+
+.edu-method-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 24px; background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+}
+.edu-method-num {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 17px; color: #fff;
+}
+.edu-method-h2 { font-family: var(--font-d); font-size: 20px; color: var(--text); margin: 0; display: flex; align-items: center; gap: 8px; }
+.edu-method-h2 i { font-size: 14px; }
+.edu-method-rule {
+  padding: 12px 24px; font-size: 13px; line-height: 1.7;
+  background: var(--accent-dim); border-bottom: 1px solid var(--border2);
+  color: var(--text-mid); transition: background var(--t-theme);
+}
+.edu-method-rule ol { padding-left: 20px; margin-top: 6px; }
+.edu-method-rule li { margin-bottom: 4px; }
+.edu-method-body { padding: 20px 24px; }
+
+.edu-interactive-engine {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-top: 16px;
+}
+.edu-input-panel {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 20px; border-right: 1px solid var(--border2);
+}
+.edu-input-group { display: flex; flex-direction: column; gap: 5px; }
+.edu-input-group label {
+  font-family: var(--font-m); font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+}
+.edu-input-field {
+  padding: 9px 12px; border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm); font-family: var(--font-m); font-size: 16px;
+  background: var(--bg-surface); color: var(--text); outline: none;
+  transition: border-color var(--t), box-shadow var(--t); width: 100%;
+}
+.edu-input-field:focus { border-color: var(--accent-mid); box-shadow: 0 0 0 3px var(--accent-dim); }
+.edu-select-field {
+  padding: 9px 12px; border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm); font-family: var(--font-m); font-size: 13px;
+  background: var(--bg-surface); color: var(--text); outline: none; cursor: pointer;
+}
+
+.edu-canvas-panel {
+  background: var(--bg-surface);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  padding: 24px; min-height: 200px;
+}
+.edu-canvas-panel svg { display: block; overflow: visible; }
+
+/* Caixa de porcentagem/fração */
+.edu-fraction-box {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-m); font-size: 20px;
+  margin: 12px 0; flex-wrap: wrap;
+}
+.edu-frac {
+  display: inline-flex; flex-direction: column; align-items: center;
+  font-size: 22px;
+}
+.edu-frac .num { border-bottom: 2px solid var(--text); padding: 0 8px; }
+.edu-frac .den { padding: 0 8px; }
+.edu-frac-result-box {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 14px 20px;
+  text-align: center; min-width: 160px;
+}
+.edu-frac-result-val { font-family: var(--font-m); font-size: 24px; font-weight: 700; color: var(--text); }
+.edu-frac-type-badge {
+  display: inline-block; margin-top: 8px;
+  padding: 4px 12px; border-radius: 20px;
+  background: var(--accent-dim); color: var(--accent-text);
+  font-family: var(--font-m); font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  transition: all var(--t-theme);
+}
+
+@media (max-width: 768px) {
+  .edu-interactive-engine { grid-template-columns: 1fr; }
+  .edu-input-panel { border-right: none; border-bottom: 1px solid var(--border2); }
+}
+@media (max-width: 480px) {
+  .edu-method-header { padding: 12px 14px; }
+  .edu-method-body { padding: 14px 16px; }
 }
