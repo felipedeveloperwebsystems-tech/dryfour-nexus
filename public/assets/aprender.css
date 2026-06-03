@@ -46,8 +46,8 @@
   transition: transform var(--t) var(--ease), box-shadow var(--t);
   will-change: transform;
   z-index: 500;
-  /* DESKTOP: sempre visível — transform zerado explicitamente */
-  transform: translateX(0) !important;
+  /* DESKTOP ≥1025px: sempre visível, transform zerado */
+  transform: translateX(0);
 }
 
 /* ===================================================================
@@ -549,19 +549,23 @@
 @media (max-width: 1024px) {
   .edu-layout { display: block; }
 
-  /* Sidebar: sai do fluxo e vira drawer deslizante */
+  /* Sidebar: sai do fluxo → drawer fechado por padrão */
   .edu-sidebar {
     position: fixed;
     top: 0; left: 0;
     width: min(300px, 90vw);
     height: 100dvh;
-    transform: translateX(-105%);
+    /* Fechado: fora da tela à esquerda */
+    transform: translateX(-105%) !important;
     box-shadow: var(--shadow-lg);
-    z-index: 500;
-    transition: transform var(--t) var(--ease);
+    z-index: 600;
+    transition: transform 0.32s cubic-bezier(0.2,0.9,0.4,1);
   }
+
+  /* Aberto via JS: adiciona .open */
   .edu-sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+    box-shadow: 4px 0 40px rgba(0,0,0,0.18);
   }
 
   /* Botão fechar — visível no mobile */

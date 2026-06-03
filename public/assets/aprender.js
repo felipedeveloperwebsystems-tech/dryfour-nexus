@@ -68,25 +68,70 @@ const EDU_MOCK_CONTENT = {
   matematica: {
     'Operações': {
       title: 'Operações com Números Decimais',
-      summary: 'Adição, subtração, multiplicação e divisão com decimais — simuladores visuais interativos.',
-      difficulty: 'iniciante', duration_min: 25,
+      summary: 'Adição, subtração, multiplicação e divisão com decimais. Entenda a teoria, veja exemplos e treine com os simuladores interativos.',
+      difficulty: 'iniciante', duration_min: 30,
       content: `
-<h2>Operações com Números Decimais</h2>
-<p>Os números decimais estão em toda situação real: preços, medidas, porcentagens. Use os simuladores abaixo para visualizar cada operação passo a passo, em tempo real. Modifique os valores e observe o resultado se adaptar automaticamente.</p>
+<h2>O que são Números Decimais?</h2>
+<p>Números decimais são aqueles que possuem uma parte inteira e uma parte fracionária separadas por vírgula. Eles aparecem em toda situação do dia a dia: preço de produtos, medidas de comprimento, peso, temperatura. Dominar as quatro operações com decimais é a base de toda a matemática prática.</p>
 
+<!-- ══════════════════════════════════════════════
+     SEÇÃO 1: ADIÇÃO E SUBTRAÇÃO
+     ══════════════════════════════════════════════ -->
 <div class="edu-math-card">
   <div class="edu-math-card-header">
     <span class="edu-math-op-badge edu-math-op-add">01</span>
-    <h3 class="edu-math-title"><i class="fas fa-plus-minus" aria-hidden="true"></i> Adição e Subtração</h3>
+    <h3 class="edu-math-title"><i class="fas fa-plus-minus" aria-hidden="true"></i> Adição e Subtração de Decimais</h3>
   </div>
   <div class="edu-math-rule">
-    <strong>Regra:</strong> iguale as casas decimais com zeros à direita, alinhe <em>vírgula abaixo de vírgula</em> e opere normalmente.
+    <strong>Regra de ouro:</strong> iguale o número de casas decimais adicionando zeros à direita e alinhe <em>vírgula embaixo de vírgula</em>. Depois opere normalmente como inteiros.
   </div>
+
+  <div style="padding:20px">
+    <h4 style="font-size:15px;margin-bottom:12px;color:var(--text)">Como funciona — passo a passo</h4>
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">Vamos somar <strong>8,75 + 3,4</strong>. Primeiro igualamos as casas decimais: 3,4 vira 3,40. Depois alinhamos as vírgulas e somamos coluna por coluna:</p>
+
+    <div class="edu-math-example">
+      <span class="edu-math-example-title">Exemplo resolvido — Adição</span>
+      <div class="edu-math-cols">
+        <div class="edu-math-col">
+          <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="140" y="30" text-anchor="end" font-size="22" fill="currentColor">8,75</text>
+            <text x="140" y="62" text-anchor="end" font-size="22" fill="currentColor">+ 3,40</text>
+            <line x1="10" y1="76" x2="150" y2="76" stroke="currentColor" stroke-width="2"/>
+            <text x="140" y="108" text-anchor="end" font-size="22" fill="#FF9F1C" font-weight="700">12,15</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim);margin-top:4px">8,75 + 3,40 = 12,15</p>
+        </div>
+        <div class="edu-math-col">
+          <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="140" y="30" text-anchor="end" font-size="22" fill="currentColor">15,30</text>
+            <text x="140" y="62" text-anchor="end" font-size="22" fill="currentColor">− 6,80</text>
+            <line x1="10" y1="76" x2="150" y2="76" stroke="currentColor" stroke-width="2"/>
+            <text x="140" y="108" text-anchor="end" font-size="22" fill="#FF9F1C" font-weight="700">8,50</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim);margin-top:4px">15,30 − 6,80 = 8,50</p>
+        </div>
+        <div class="edu-math-col">
+          <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="140" y="30" text-anchor="end" font-size="22" fill="currentColor">2,500</text>
+            <text x="140" y="62" text-anchor="end" font-size="22" fill="currentColor">+ 0,375</text>
+            <line x1="10" y1="76" x2="150" y2="76" stroke="currentColor" stroke-width="2"/>
+            <text x="140" y="108" text-anchor="end" font-size="22" fill="#FF9F1C" font-weight="700">2,875</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim);margin-top:4px">2,5 + 0,375 = 2,875</p>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="font-size:15px;margin:20px 0 10px;color:var(--text)">Simulador — Adição e Subtração</h4>
+    <p style="font-size:13px;color:var(--text-mid);margin-bottom:14px">Digite dois números e escolha a operação. A conta se monta automaticamente com o alinhamento correto das vírgulas.</p>
+  </div>
+
   <div class="edu-math-engine">
     <div class="edu-math-inputs">
       <div class="edu-math-input-group">
         <label for="em-add1">Primeiro número</label>
-        <input type="number" id="em-add1" value="14.38" step="0.01" class="edu-math-input">
+        <input type="number" id="em-add1" value="8.75" step="0.01" class="edu-math-input">
       </div>
       <div class="edu-math-input-group">
         <label for="em-op">Operação</label>
@@ -97,7 +142,7 @@ const EDU_MOCK_CONTENT = {
       </div>
       <div class="edu-math-input-group">
         <label for="em-add2">Segundo número</label>
-        <input type="number" id="em-add2" value="5.60" step="0.01" class="edu-math-input">
+        <input type="number" id="em-add2" value="3.40" step="0.01" class="edu-math-input">
       </div>
     </div>
     <div class="edu-math-visual">
@@ -107,23 +152,73 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     SEÇÃO 2: MULTIPLICAÇÃO
+     ══════════════════════════════════════════════ -->
 <div class="edu-math-card">
   <div class="edu-math-card-header">
     <span class="edu-math-op-badge edu-math-op-mul">02</span>
-    <h3 class="edu-math-title"><i class="fas fa-xmark" aria-hidden="true"></i> Multiplicação</h3>
+    <h3 class="edu-math-title"><i class="fas fa-xmark" aria-hidden="true"></i> Multiplicação de Decimais</h3>
   </div>
   <div class="edu-math-rule">
-    <strong>Regra:</strong> multiplique como inteiros. Depois some o total de casas decimais dos dois fatores e posicione a vírgula no produto da direita para a esquerda.
+    <strong>Regra de ouro:</strong> multiplique como se fossem inteiros (ignore as vírgulas). Depois some o total de casas decimais dos dois fatores e coloque a vírgula no produto <em>da direita para a esquerda</em>.
   </div>
+
+  <div style="padding:20px">
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">Vamos multiplicar <strong>2,4 × 1,5</strong>. Ignorando as vírgulas: 24 × 15 = 360. Fatores têm 1+1=2 casas decimais. Resultado: 3,60.</p>
+
+    <div class="edu-math-example">
+      <span class="edu-math-example-title">Exemplos resolvidos — Multiplicação</span>
+      <div class="edu-math-cols">
+        <div class="edu-math-col">
+          <svg width="180" height="150" viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="160" y="30" text-anchor="end" font-size="20" fill="currentColor">2,4</text>
+            <text x="160" y="60" text-anchor="end" font-size="20" fill="currentColor">× 1,5</text>
+            <line x1="10" y1="74" x2="170" y2="74" stroke="currentColor" stroke-width="2"/>
+            <text x="160" y="102" text-anchor="end" font-size="18" fill="var(--text-mid)">24×15=360</text>
+            <text x="160" y="130" text-anchor="end" font-size="20" fill="#7A00FF" font-weight="700">3,60</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim)">2 casas decimais no total</p>
+        </div>
+        <div class="edu-math-col">
+          <svg width="180" height="150" viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="160" y="30" text-anchor="end" font-size="20" fill="currentColor">1,25</text>
+            <text x="160" y="60" text-anchor="end" font-size="20" fill="currentColor">× 0,4</text>
+            <line x1="10" y1="74" x2="170" y2="74" stroke="currentColor" stroke-width="2"/>
+            <text x="160" y="102" text-anchor="end" font-size="18" fill="var(--text-mid)">125×4=500</text>
+            <text x="160" y="130" text-anchor="end" font-size="20" fill="#7A00FF" font-weight="700">0,500</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim)">3 casas decimais no total</p>
+        </div>
+        <div class="edu-math-col">
+          <svg width="180" height="150" viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="160" y="30" text-anchor="end" font-size="20" fill="currentColor">0,06</text>
+            <text x="160" y="60" text-anchor="end" font-size="20" fill="currentColor">× 0,3</text>
+            <line x1="10" y1="74" x2="170" y2="74" stroke="currentColor" stroke-width="2"/>
+            <text x="160" y="102" text-anchor="end" font-size="18" fill="var(--text-mid)">6×3=18</text>
+            <text x="160" y="130" text-anchor="end" font-size="20" fill="#7A00FF" font-weight="700">0,018</text>
+          </svg>
+          <p style="font-size:12px;color:var(--text-dim)">3 casas decimais no total</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 18px;margin-top:16px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--text)">Atalho prático:</strong> multiplicar por <strong>10, 100, 1.000</strong> = deslocar a vírgula <em>para a direita</em> 1, 2, 3 casas. Ex: 3,7 × 100 = 370.
+    </div>
+
+    <h4 style="font-size:15px;margin:20px 0 10px;color:var(--text)">Simulador — Multiplicação</h4>
+  </div>
+
   <div class="edu-math-engine">
     <div class="edu-math-inputs">
       <div class="edu-math-input-group">
         <label for="em-mul1">Fator A</label>
-        <input type="number" id="em-mul1" value="3.45" step="0.01" class="edu-math-input">
+        <input type="number" id="em-mul1" value="2.4" step="0.01" class="edu-math-input">
       </div>
       <div class="edu-math-input-group">
         <label for="em-mul2">× Fator B</label>
-        <input type="number" id="em-mul2" value="2.1" step="0.1" class="edu-math-input">
+        <input type="number" id="em-mul2" value="1.5" step="0.1" class="edu-math-input">
       </div>
     </div>
     <div class="edu-math-visual">
@@ -133,23 +228,73 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     SEÇÃO 3: DIVISÃO
+     ══════════════════════════════════════════════ -->
 <div class="edu-math-card">
   <div class="edu-math-card-header">
     <span class="edu-math-op-badge edu-math-op-div">03</span>
-    <h3 class="edu-math-title"><i class="fas fa-divide" aria-hidden="true"></i> Divisão</h3>
+    <h3 class="edu-math-title"><i class="fas fa-divide" aria-hidden="true"></i> Divisão de Decimais</h3>
   </div>
   <div class="edu-math-rule">
-    <strong>Regra:</strong> iguale as casas decimais dos dois com zeros, depois <em>corte a vírgula</em> de ambos — divisão de inteiros normal.
+    <strong>Regra de ouro:</strong> iguale as casas decimais de dividendo e divisor adicionando zeros. Depois <em>corte a vírgula de ambos</em> — divisão de inteiros comum. Se não for exata, continue com casas decimais no quociente.
   </div>
+
+  <div style="padding:20px">
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">Vamos dividir <strong>3,6 ÷ 0,4</strong>. Igualamos: ambos têm 1 casa. Cortamos as vírgulas: 36 ÷ 4 = 9.</p>
+
+    <div class="edu-math-example">
+      <span class="edu-math-example-title">Exemplos resolvidos — Divisão</span>
+      <div class="edu-math-cols">
+        <div class="edu-math-col">
+          <svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="14" y="36" font-size="20" fill="currentColor">36</text>
+            <line x1="50" y1="14" x2="50" y2="80" stroke="currentColor" stroke-width="2"/>
+            <line x1="50" y1="44" x2="150" y2="44" stroke="currentColor" stroke-width="2"/>
+            <text x="62" y="36" font-size="20" fill="currentColor">4</text>
+            <text x="62" y="72" font-size="20" fill="#FF0055" font-weight="700">9</text>
+            <text x="14" y="110" font-size="13" fill="var(--text-dim)">3,6 ÷ 0,4 = 36 ÷ 4 = 9</text>
+          </svg>
+        </div>
+        <div class="edu-math-col">
+          <svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="14" y="36" font-size="20" fill="currentColor">225</text>
+            <line x1="60" y1="14" x2="60" y2="80" stroke="currentColor" stroke-width="2"/>
+            <line x1="60" y1="44" x2="160" y2="44" stroke="currentColor" stroke-width="2"/>
+            <text x="72" y="36" font-size="20" fill="currentColor">15</text>
+            <text x="72" y="72" font-size="20" fill="#FF0055" font-weight="700">15</text>
+            <text x="14" y="110" font-size="13" fill="var(--text-dim)">2,25 ÷ 0,15 = 225÷15 = 15</text>
+          </svg>
+        </div>
+        <div class="edu-math-col">
+          <svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-m);display:block">
+            <text x="14" y="36" font-size="20" fill="currentColor">13</text>
+            <line x1="44" y1="14" x2="44" y2="100" stroke="currentColor" stroke-width="2"/>
+            <line x1="44" y1="44" x2="150" y2="44" stroke="currentColor" stroke-width="2"/>
+            <text x="56" y="36" font-size="20" fill="currentColor">4</text>
+            <text x="56" y="72" font-size="18" fill="#FF0055" font-weight="700">3,25</text>
+            <text x="14" y="118" font-size="13" fill="var(--text-dim)">13 ÷ 4 = 3,25 (exato)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 18px;margin-top:16px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--text)">Atalho prático:</strong> dividir por <strong>10, 100, 1.000</strong> = deslocar a vírgula <em>para a esquerda</em> 1, 2, 3 casas. Ex: 47,5 ÷ 100 = 0,475.
+    </div>
+
+    <h4 style="font-size:15px;margin:20px 0 10px;color:var(--text)">Simulador — Divisão</h4>
+  </div>
+
   <div class="edu-math-engine">
     <div class="edu-math-inputs">
       <div class="edu-math-input-group">
         <label for="em-div1">Dividendo</label>
-        <input type="number" id="em-div1" value="7.5" step="0.1" class="edu-math-input">
+        <input type="number" id="em-div1" value="3.6" step="0.1" class="edu-math-input">
       </div>
       <div class="edu-math-input-group">
         <label for="em-div2">÷ Divisor</label>
-        <input type="number" id="em-div2" value="0.25" step="0.01" class="edu-math-input">
+        <input type="number" id="em-div2" value="0.4" step="0.1" class="edu-math-input">
       </div>
     </div>
     <div class="edu-math-visual">
@@ -159,23 +304,63 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     SEÇÃO 4: FRAÇÃO → DECIMAL → PORCENTAGEM
+     ══════════════════════════════════════════════ -->
 <div class="edu-math-card">
   <div class="edu-math-card-header">
     <span class="edu-math-op-badge edu-math-op-frac">04</span>
     <h3 class="edu-math-title"><i class="fas fa-percent" aria-hidden="true"></i> Fração → Decimal → Porcentagem</h3>
   </div>
   <div class="edu-math-rule">
-    <strong>Regra:</strong> divida numerador pelo denominador. Multiplique por 100 para a porcentagem. Decimais que repetem infinitamente são dízimas periódicas.
+    <strong>Regra de ouro:</strong> divida o numerador pelo denominador para obter o decimal. Multiplique por 100 para a porcentagem. Quando o decimal repete infinitamente, chamamos de <em>dízima periódica</em>.
   </div>
+
+  <div style="padding:20px">
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">As três formas são equivalentes e representam a mesma proporção. Saber converter entre elas é essencial para o dia a dia, ENEM e concursos.</p>
+
+    <div class="edu-math-example">
+      <span class="edu-math-example-title">Exemplos de conversão</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px">
+        <div style="background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-family:var(--font-m);font-size:22px;margin-bottom:8px">
+            <span style="border-bottom:2px solid currentColor;padding:0 6px">3</span><br>
+            <span style="padding:0 6px">4</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-mid)">= <strong>0,75</strong> = <strong style="color:var(--accent-text)">75%</strong></div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Decimal exato</div>
+        </div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-family:var(--font-m);font-size:22px;margin-bottom:8px">
+            <span style="border-bottom:2px solid currentColor;padding:0 6px">1</span><br>
+            <span style="padding:0 6px">3</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-mid)">= <strong>0,333…</strong> = <strong style="color:var(--accent-text)">33,33%</strong></div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Dízima periódica simples</div>
+        </div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-family:var(--font-m);font-size:22px;margin-bottom:8px">
+            <span style="border-bottom:2px solid currentColor;padding:0 6px">5</span><br>
+            <span style="padding:0 6px">6</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-mid)">= <strong>0,8333…</strong> = <strong style="color:var(--accent-text)">83,33%</strong></div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Dízima periódica composta</div>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="font-size:15px;margin:20px 0 10px;color:var(--text)">Simulador — Conversor de Fração</h4>
+  </div>
+
   <div class="edu-math-engine">
     <div class="edu-math-inputs">
       <div class="edu-math-input-group">
         <label for="em-fnum">Numerador</label>
-        <input type="number" id="em-fnum" value="1" min="0" class="edu-math-input">
+        <input type="number" id="em-fnum" value="3" min="0" class="edu-math-input">
       </div>
       <div class="edu-math-input-group">
         <label for="em-fden">Denominador</label>
-        <input type="number" id="em-fden" value="3" min="1" class="edu-math-input">
+        <input type="number" id="em-fden" value="4" min="1" class="edu-math-input">
       </div>
     </div>
     <div class="edu-math-visual">
@@ -188,61 +373,120 @@ const EDU_MOCK_CONTENT = {
 <script>
 (function(){
   'use strict';
-  const $ = id => document.getElementById(id);
+  var $ = function(id){ return document.getElementById(id); };
 
   function renderAdd(){
-    var v1=parseFloat($('em-add1').value)||0, v2=parseFloat($('em-add2').value)||0;
-    var op=$('em-op').value, res=op==='+'?v1+v2:v1-v2;
-    var s1=v1.toString(),s2=v2.toString();
+    var v1=parseFloat($('em-add1').value)||0;
+    var v2=parseFloat($('em-add2').value)||0;
+    var op=$('em-op').value;
+    var res=op==='+'?v1+v2:v1-v2;
+    var s1=v1.toString(), s2=v2.toString();
     var c1=s1.includes('.')?s1.split('.')[1].length:0;
     var c2=s2.includes('.')?s2.split('.')[1].length:0;
     var mc=Math.max(c1,c2);
     var sym=op==='+'?'+':'−';
-    $('em-add-calc').innerHTML='<div class="edu-mc-row">'+v1.toFixed(mc)+'</div><div class="edu-mc-row edu-mc-op">'+sym+' '+v2.toFixed(mc)+'</div><div class="edu-mc-line"></div><div class="edu-mc-row edu-mc-result">'+res.toFixed(mc)+'</div>';
-    $('em-add-explain').innerHTML='<span class="edu-mc-tag">'+mc+' casas decimais</span><span class="edu-mc-tag edu-mc-tag--ok">= '+res.toFixed(mc)+'</span>';
+    var el=$('em-add-calc');
+    if(el) el.innerHTML='<div class="edu-mc-row">'+v1.toFixed(mc)+'</div>'
+      +'<div class="edu-mc-row edu-mc-op">'+sym+' '+v2.toFixed(mc)+'</div>'
+      +'<div class="edu-mc-line"></div>'
+      +'<div class="edu-mc-row edu-mc-result">'+res.toFixed(mc)+'</div>';
+    var ex=$('em-add-explain');
+    if(ex) ex.innerHTML='<span class="edu-mc-tag">'+mc+' casas decimais igualadas</span>'
+      +'<span class="edu-mc-tag edu-mc-tag--ok">= '+res.toFixed(mc)+'</span>';
   }
 
   function renderMul(){
-    var f1=parseFloat($('em-mul1').value)||0, f2=parseFloat($('em-mul2').value)||0;
+    var f1=parseFloat($('em-mul1').value)||0;
+    var f2=parseFloat($('em-mul2').value)||0;
     var prod=f1*f2;
-    var s1=f1.toString(),s2=f2.toString();
+    var s1=f1.toString(), s2=f2.toString();
     var c1=s1.includes('.')?s1.split('.')[1].length:0;
     var c2=s2.includes('.')?s2.split('.')[1].length:0;
     var tc=c1+c2;
-    $('em-mul-calc').innerHTML='<div class="edu-mc-row">'+s1+'</div><div class="edu-mc-row edu-mc-op">× '+s2+'</div><div class="edu-mc-line"></div><div class="edu-mc-row edu-mc-result">'+prod.toFixed(tc)+'</div>';
-    $('em-mul-explain').innerHTML='<span class="edu-mc-tag">A: '+c1+' casas</span><span class="edu-mc-tag">B: '+c2+' casas</span><span class="edu-mc-tag">Total: '+tc+'</span><span class="edu-mc-tag edu-mc-tag--ok">= '+prod.toFixed(tc)+'</span>';
+    var el=$('em-mul-calc');
+    if(el) el.innerHTML='<div class="edu-mc-row">'+s1+'</div>'
+      +'<div class="edu-mc-row edu-mc-op">× '+s2+'</div>'
+      +'<div class="edu-mc-line"></div>'
+      +'<div class="edu-mc-row edu-mc-result">'+prod.toFixed(tc)+'</div>';
+    var ex=$('em-mul-explain');
+    if(ex) ex.innerHTML='<span class="edu-mc-tag">A: '+c1+' casa(s)</span>'
+      +'<span class="edu-mc-tag">B: '+c2+' casa(s)</span>'
+      +'<span class="edu-mc-tag">Total: '+tc+' casas</span>'
+      +'<span class="edu-mc-tag edu-mc-tag--ok">= '+prod.toFixed(tc)+'</span>';
   }
 
   function renderDiv(){
-    var d1=parseFloat($('em-div1').value)||0, d2=parseFloat($('em-div2').value)||1;
-    var s1=d1.toString(),s2=d2.toString();
+    var d1=parseFloat($('em-div1').value)||0;
+    var d2=parseFloat($('em-div2').value)||1;
+    if(d2===0){ d2=1; }
+    var s1=d1.toString(), s2=d2.toString();
     var c1=s1.includes('.')?s1.split('.')[1].length:0;
     var c2=s2.includes('.')?s2.split('.')[1].length:0;
-    var mc=Math.max(c1,c2), fator=Math.pow(10,mc);
-    var intD=Math.round(d1*fator), intDv=Math.round(d2*fator);
+    var mc=Math.max(c1,c2);
+    var fator=Math.pow(10,mc);
+    var intD=Math.round(d1*fator);
+    var intDv=Math.round(d2*fator);
     var quot=d1/d2;
-    $('em-div-calc').innerHTML='<div class="edu-mc-division"><span class="edu-mc-dividend">'+intD+'</span><span class="edu-mc-divbar"> ÷ </span><span class="edu-mc-divisor">'+intDv+'</span><span class="edu-mc-equals"> = </span><span class="edu-mc-quotient">'+Number(quot.toFixed(6))+'</span></div>';
-    $('em-div-explain').innerHTML='<span class="edu-mc-tag">×'+fator+' remove as vírgulas</span><span class="edu-mc-tag edu-mc-tag--ok">= '+Number(quot.toFixed(6))+'</span>';
+    var el=$('em-div-calc');
+    if(el) el.innerHTML='<div class="edu-mc-division">'
+      +'<span class="edu-mc-dividend">'+intD+'</span>'
+      +'<span class="edu-mc-divbar"> ÷ </span>'
+      +'<span class="edu-mc-divisor">'+intDv+'</span>'
+      +'<span class="edu-mc-equals"> = </span>'
+      +'<span class="edu-mc-quotient">'+Number(quot.toFixed(6))+'</span>'
+      +'</div>';
+    var ex=$('em-div-explain');
+    if(ex) ex.innerHTML='<span class="edu-mc-tag">×'+fator+' elimina vírgulas</span>'
+      +'<span class="edu-mc-tag edu-mc-tag--ok">= '+Number(quot.toFixed(6))+'</span>';
   }
 
   function renderFrac(){
-    var num=parseInt($('em-fnum').value)||0, den=parseInt($('em-fden').value)||1;
-    if(den===0)return;
-    var dec=num/den, ds=dec.toString(), isDiz=ds.length>8;
+    var num=parseInt($('em-fnum').value)||0;
+    var den=parseInt($('em-fden').value)||1;
+    if(den===0){ den=1; }
+    var dec=num/den;
+    var ds=dec.toString();
+    var isDiz=ds.length>9 && ds.includes('.');
     var pct=(dec*100).toFixed(2);
-    var tipo=!ds.includes('.')? 'Número Inteiro' : isDiz? 'Dízima Periódica' : 'Decimal Exato';
-    $('em-frac-calc').innerHTML='<div class="edu-mc-frac-row"><div class="edu-mc-frac"><span class="edu-mc-frac-num">'+num+'</span><span class="edu-mc-frac-line"></span><span class="edu-mc-frac-den">'+den+'</span></div><span class="edu-mc-equals">=</span><span class="edu-mc-dec">'+(isDiz?dec.toFixed(5)+'…':ds)+'</span><span class="edu-mc-equals">=</span><span class="edu-mc-pct">'+pct+'%</span></div>';
-    $('em-frac-explain').innerHTML='<span class="edu-mc-tag">'+tipo+'</span><span class="edu-mc-tag edu-mc-tag--ok">'+pct+'% do total</span>';
+    var tipo='Decimal Exato';
+    if(!ds.includes('.')) tipo='Número Inteiro';
+    else if(isDiz){
+      // Detecta dízima composta: parte não-periódica antes do período
+      var decPart=ds.split('.')[1]||'';
+      tipo=decPart.length>4?'Dízima Periódica Composta':'Dízima Periódica Simples';
+    }
+    var decDisplay=isDiz?dec.toFixed(5)+'…':ds;
+    var el=$('em-frac-calc');
+    if(el) el.innerHTML='<div class="edu-mc-frac-row">'
+      +'<div class="edu-mc-frac">'
+      +'<span class="edu-mc-frac-num">'+num+'</span>'
+      +'<span class="edu-mc-frac-line"></span>'
+      +'<span class="edu-mc-frac-den">'+den+'</span>'
+      +'</div>'
+      +'<span class="edu-mc-equals"> = </span>'
+      +'<span class="edu-mc-dec">'+decDisplay+'</span>'
+      +'<span class="edu-mc-equals"> = </span>'
+      +'<span class="edu-mc-pct">'+pct+'%</span>'
+      +'</div>';
+    var ex=$('em-frac-explain');
+    if(ex) ex.innerHTML='<span class="edu-mc-tag">'+tipo+'</span>'
+      +'<span class="edu-mc-tag edu-mc-tag--ok">'+pct+'% do total</span>';
+  }
+
+  function addEv(id, fn){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('input', fn);
   }
 
   function init(){
-    ['em-add1','em-add2','em-op'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderAdd);});
-    ['em-mul1','em-mul2'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderMul);});
-    ['em-div1','em-div2'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderDiv);});
-    ['em-fnum','em-fden'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderFrac);});
-    renderAdd();renderMul();renderDiv();renderFrac();
+    addEv('em-add1',renderAdd); addEv('em-add2',renderAdd); addEv('em-op',renderAdd);
+    addEv('em-mul1',renderMul); addEv('em-mul2',renderMul);
+    addEv('em-div1',renderDiv); addEv('em-div2',renderDiv);
+    addEv('em-fnum',renderFrac); addEv('em-fden',renderFrac);
+    renderAdd(); renderMul(); renderDiv(); renderFrac();
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
 </script>`,
@@ -447,31 +691,46 @@ const EduSidebarModule = {
 
     this.hamBtn?.addEventListener('click',   () => this.open());
     this.closeBtn?.addEventListener('click', () => this.close());
-    this.overlay?.addEventListener('click',  () => this.close());
+    this.overlay?.addEventListener('click',     () => this.close());
+    this.overlay?.addEventListener('touchstart', () => this.close(), { passive: true });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && EduState.sidebarOpen) this.close(); });
+    // Redimensionamento: se desktop, fecha e garante estado limpo
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1024 && EduState.sidebarOpen) {
+        EduState.sidebarOpen = false;
+        this.sidebar?.classList.remove('open');
+        this.overlay?.classList.remove('active');
+        this.hamBtn?.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    }, { passive: true });
 
     this._initSearch();
   },
 
   open() {
+    // Só abre no mobile (≤1024px) — no desktop o sidebar é sempre visível
+    if (window.innerWidth > 1024) return;
     if (EduState.sidebarOpen) return;
     EduState.sidebarOpen = true;
     this.sidebar?.classList.add('open');
     this.overlay?.classList.add('active');
-    this.hamBtn?.classList.add('open');
     this.hamBtn?.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => this.closeBtn?.focus(), 50);
+    // Foco no botão fechar para acessibilidade
+    setTimeout(() => this.closeBtn?.focus(), 60);
   },
 
   close() {
+    // No desktop o sidebar fica sempre visível — não fecha
+    if (window.innerWidth > 1024) return;
     if (!EduState.sidebarOpen) return;
     EduState.sidebarOpen = false;
     this.sidebar?.classList.remove('open');
     this.overlay?.classList.remove('active');
-    this.hamBtn?.classList.remove('open');
     this.hamBtn?.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    // Retorna foco ao hamburger para acessibilidade
     this.hamBtn?.focus();
   },
 
