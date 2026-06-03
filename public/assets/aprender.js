@@ -68,224 +68,310 @@ const EDU_MOCK_CONTENT = {
   matematica: {
     'Operações': {
       title: 'Operações com Números Decimais',
-      summary: 'Domine as quatro operações com decimais: teoria completa, terminologia técnica, passo a passo e calculadoras interativas com SVG.',
+      summary: 'Domine as quatro operações com decimais: teoria completa, terminologia técnica, passo a passo e calculadoras interativas visuais.',
       difficulty: 'iniciante', duration_min: 35,
       content: `
+<style>
+/* ── Estilos gemini-code adaptados ao Dryfour ── */
+.op-bento-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 32px;
+  transition: box-shadow var(--t);
+}
+.op-bento-card:hover { box-shadow: var(--shadow-md); }
+
+.op-card-title {
+  font-family: var(--font-d);
+  font-size: 22px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border2);
+  padding-bottom: 14px;
+  color: var(--text);
+}
+.op-card-title i { font-size: 18px; }
+
+.op-method-box {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 14px 18px;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  margin-bottom: 22px;
+  transition: border-color var(--t-theme), background var(--t-theme);
+}
+.op-method-box ol { padding-left: 20px; color: var(--text-mid); margin-top: 6px; }
+.op-method-box li { margin-bottom: 5px; font-size: 14px; line-height: 1.6; }
+
+/* Engine: grid 2 colunas = igual gemini-code */
+.op-interactive-engine {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-top: 18px;
+}
+
+/* Painel de inputs — igual gemini-code */
+.op-input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  border-right: 1px solid var(--border2);
+  background: var(--bg2);
+}
+.op-input-group { display: flex; flex-direction: column; gap: 6px; }
+.op-input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+.op-input-group input,
+.op-input-group select {
+  padding: 10px 14px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-m);
+  font-size: 15px;
+  outline: none;
+  background: var(--bg-surface);
+  color: var(--text);
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.op-input-group input:focus,
+.op-input-group select:focus {
+  border-color: var(--accent-mid);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Canvas panel — igual gemini-code */
+.op-canvas-panel {
+  background: var(--bg-surface);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+  padding: 20px;
+}
+.op-canvas-panel.div-panel {
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 40px;
+}
+
+/* Fração box — igual gemini-code */
+.op-fraction-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 18px;
+  margin: 14px 0;
+  font-family: var(--font-m);
+  flex-wrap: wrap;
+}
+.op-fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.op-fraction .num {
+  border-bottom: 2px solid var(--text);
+  padding: 0 6px;
+}
+.op-fraction .den { padding: 0 6px; }
+
+/* Responsivo mobile — igual gemini-code */
+@media (max-width: 768px) {
+  .op-interactive-engine {
+    grid-template-columns: 1fr;
+  }
+  .op-input-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border2);
+  }
+  .op-canvas-panel {
+    min-height: 180px;
+  }
+  .op-canvas-panel.div-panel {
+    padding-left: 20px;
+  }
+  .op-bento-card {
+    padding: 20px 16px;
+  }
+}
+@media (max-width: 480px) {
+  .op-card-title { font-size: 18px; }
+  .op-input-group input,
+  .op-input-group select { font-size: 14px; }
+}
+</style>
+
 <h2>O que são Números Decimais?</h2>
-<p>Números decimais são números racionais escritos com vírgula que separa a <strong>parte inteira</strong> da <strong>parte fracionária</strong>. Todo número decimal pode ser expresso como uma fração com denominador potência de 10 (10, 100, 1.000…).</p>
-<p>Exemplo: <strong>3,75</strong> = 3 + 7/10 + 5/100 = <span style="font-family:var(--font-m)">375/100</span></p>
+<p>Números decimais são números racionais escritos com vírgula separando a <strong>parte inteira</strong> da <strong>parte fracionária</strong>. Todo número decimal pode ser expresso como fração com denominador potência de 10. Exemplos: <strong>3,75 = 375/100</strong>, <strong>0,008 = 8/1000</strong>.</p>
+<p style="margin-top:10px;font-size:14px;color:var(--text-mid)"><strong>Casas decimais</strong> — quantidade de algarismos após a vírgula. <strong>Décimos:</strong> 1ª casa. <strong>Centésimos:</strong> 2ª casa. <strong>Milésimos:</strong> 3ª casa.</p>
 
-<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:16px 20px;margin:20px 0;font-size:13px;color:var(--text-mid)">
-  <strong style="color:var(--text)">Terminologia essencial:</strong><br>
-  <strong>Algarismos significativos</strong> — todos os dígitos não-nulos e os zeros entre eles.<br>
-  <strong>Casas decimais</strong> — quantidade de algarismos após a vírgula.<br>
-  <strong>Décimos, centésimos, milésimos</strong> — 1ª, 2ª, 3ª posição após a vírgula.
-</div>
-
-<!-- ═══════════════════════════════════════════════════════
-     ADIÇÃO E SUBTRAÇÃO
-     ═══════════════════════════════════════════════════════ -->
-<div class="edu-method-card">
-  <div class="edu-method-header">
-    <span class="edu-method-num" style="background:var(--accent)">01</span>
-    <h3 class="edu-method-h2"><i class="fas fa-plus-minus" style="color:var(--accent-text)" aria-hidden="true"></i> Adição e Subtração de Decimais</h3>
+<!-- ═══════════════════════════ 01 — ADIÇÃO / SUBTRAÇÃO ═══════════════════════════ -->
+<div class="op-bento-card" id="adicao" style="border-top:4px solid var(--accent)">
+  <div class="op-card-title">
+    <i class="fa-solid fa-calculator" style="color:var(--accent-text)" aria-hidden="true"></i>
+    1. Adição e Subtração com Decimais
   </div>
 
-  <div class="edu-method-rule">
-    <strong>Método Prático — vírgula embaixo de vírgula:</strong>
+  <div class="op-method-box" style="border-left-color:var(--accent)">
+    <strong>Método Prático Oblíquo:</strong>
     <ol>
-      <li><strong>Iguale o número de casas decimais</strong> acrescentando zeros à direita (zeros à direita não alteram o valor: 5,6 = 5,60 = 5,600).</li>
-      <li><strong>Alinhe os números</strong> colocando vírgula embaixo de vírgula — os algarismos de mesma ordem devem ficar na mesma coluna.</li>
-      <li><strong>Efetue a operação</strong> como se fossem inteiros (de baixo para cima, coluna por coluna).</li>
-      <li><strong>Posicione a vírgula</strong> no resultado alinhada com as demais.</li>
+      <li>Igualamos o número de casas decimais com o acréscimo de zeros à direita.</li>
+      <li>Montamos a conta armando <strong>vírgula debaixo de vírgula</strong>.</li>
+      <li>Executamos a operação normalmente, mantendo a vírgula do resultado perfeitamente alinhada.</li>
     </ol>
   </div>
 
-  <div class="edu-method-body">
-    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">
-      <strong>Por que igualar as casas?</strong> Porque só podemos somar grandezas de mesma ordem: décimos com décimos, centésimos com centésimos. Acrescentar zeros à direita é equivalente matemático — não muda o valor, apenas explicita os algarismos nulos.
-    </p>
-
-    <div class="edu-interactive-engine">
-      <div class="edu-input-panel">
-        <div class="edu-input-group">
-          <label for="add1">Parcela (1º número)</label>
-          <input type="number" id="add1" value="14.38" step="0.01" class="edu-input-field">
-        </div>
-        <div class="edu-input-group">
-          <label for="opSelect">Operação</label>
-          <select id="opSelect" class="edu-select-field">
-            <option value="+">Adição (+)</option>
-            <option value="-">Subtração (−)</option>
-          </select>
-        </div>
-        <div class="edu-input-group">
-          <label for="add2">Parcela / Subtraendo (2º número)</label>
-          <input type="number" id="add2" value="5.6" step="0.1" class="edu-input-field">
-        </div>
+  <div class="op-interactive-engine">
+    <div class="op-input-panel">
+      <div class="op-input-group">
+        <label for="add1">Primeiro Número (Parcela):</label>
+        <input type="number" id="add1" value="14.38" step="0.01">
       </div>
-      <div class="edu-canvas-panel">
-        <svg id="svgAdd" width="220" height="170" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
-        <div id="addInfo" style="font-size:12px;color:var(--text-dim);font-family:var(--font-m);text-align:center"></div>
+      <div class="op-input-group">
+        <label for="add2">Segundo Número (Parcela/Subtraendo):</label>
+        <input type="number" id="add2" value="5.6" step="0.1">
       </div>
+      <div class="op-input-group">
+        <label for="opSelect">Operação:</label>
+        <select id="opSelect">
+          <option value="+">Adição (+)</option>
+          <option value="-">Subtração (-)</option>
+        </select>
+      </div>
+    </div>
+    <div class="op-canvas-panel">
+      <svg id="svgAdd" width="200" height="180" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MULTIPLICAÇÃO
-     ═══════════════════════════════════════════════════════ -->
-<div class="edu-method-card">
-  <div class="edu-method-header">
-    <span class="edu-method-num" style="background:#7A00FF">02</span>
-    <h3 class="edu-method-h2"><i class="fas fa-xmark" style="color:#7A00FF" aria-hidden="true"></i> Multiplicação de Decimais</h3>
+<!-- ═══════════════════════════ 02 — MULTIPLICAÇÃO ═══════════════════════════ -->
+<div class="op-bento-card" id="multiplicacao" style="border-top:4px solid #7A00FF">
+  <div class="op-card-title">
+    <i class="fa-solid fa-square-sliders" style="color:#7A00FF" aria-hidden="true"></i>
+    2. Multiplicação e Escalonamento
   </div>
 
-  <div class="edu-method-rule">
-    <strong>Método Prático — ignore a vírgula, depois recoloque:</strong>
+  <div class="op-method-box" style="border-left-color:#7A00FF">
+    <strong>Método Prático:</strong>
     <ol>
-      <li><strong>Multiplique os fatores como inteiros</strong> — ignore as vírgulas durante o cálculo.</li>
-      <li><strong>Conte o total de casas decimais</strong> dos dois fatores somadas.</li>
-      <li><strong>No produto inteiro</strong>, conte da direita para a esquerda esse total de casas e coloque a vírgula.</li>
-      <li>Se o produto tiver menos algarismos que as casas necessárias, acrescente zeros à esquerda.</li>
+      <li>Multiplicamos os dois números como se fossem números inteiros naturais.</li>
+      <li>Contamos o total de casas decimais dos dois fatores somados.</li>
+      <li>Colocamos a vírgula no produto final contando as casas da direita para a esquerda.</li>
     </ol>
   </div>
 
-  <div class="edu-method-body">
-    <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px">
-      <strong>Por que funciona?</strong> Multiplicar por 10ⁿ desloca a vírgula n casas à direita. Ao multiplicar dois decimais, removemos as vírgulas (× por 10^c1 e 10^c2), fazemos a multiplicação inteira, depois dividimos o resultado por 10^(c1+c2) — o que equivale a recolocar a vírgula.
-    </p>
-    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--text-mid)">
-      <strong style="color:var(--text)">Atalho:</strong> multiplicar por <strong>10</strong> → desloca vírgula 1 casa à direita. Por <strong>100</strong> → 2 casas. Por <strong>0,1</strong> → 1 casa à esquerda.
-    </div>
-    <div class="edu-interactive-engine">
-      <div class="edu-input-panel">
-        <div class="edu-input-group">
-          <label for="mul1">Fator (multiplicando)</label>
-          <input type="number" id="mul1" value="3.45" step="0.01" class="edu-input-field">
-        </div>
-        <div class="edu-input-group">
-          <label for="mul2">× Fator (multiplicador)</label>
-          <input type="number" id="mul2" value="2.1" step="0.1" class="edu-input-field">
-        </div>
+  <div class="op-interactive-engine">
+    <div class="op-input-panel">
+      <div class="op-input-group">
+        <label for="mul1">Fator A (Multiplicando):</label>
+        <input type="number" id="mul1" value="3.45" step="0.01">
       </div>
-      <div class="edu-canvas-panel">
-        <svg id="svgMul" width="220" height="170" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
-        <div id="mulInfo" style="font-size:12px;color:var(--text-dim);font-family:var(--font-m);text-align:center"></div>
+      <div class="op-input-group">
+        <label for="mul2">Fator B (Multiplicador):</label>
+        <input type="number" id="mul2" value="2.1" step="0.1">
       </div>
     </div>
+    <div class="op-canvas-panel">
+      <svg id="svgMul" width="220" height="180" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
+    </div>
+  </div>
 
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border2)">
-      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">Conversão Decimal → Porcentagem</p>
-      <p style="font-size:13px;color:var(--text-mid);margin-bottom:10px">Todo decimal é uma fração centesimal. Multiplique por 100 para obter a porcentagem equivalente:</p>
-      <div class="edu-fraction-box">
-        <span id="decValue" style="font-weight:600">0,35</span>
-        <span style="color:var(--text-dim)">=</span>
-        <div class="edu-frac">
-          <span class="num" id="fracNum">35</span>
-          <span class="den">100</span>
-        </div>
-        <span style="color:var(--text-dim)">=</span>
-        <strong id="pctValue" style="color:var(--accent-text);font-size:22px;transition:color var(--t-theme)">35%</strong>
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border2)">
+    <h3 style="font-size:16px;margin-bottom:12px;color:var(--text)">Conversão Direta para Porcentagem (Gatilho Métrico)</h3>
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px">Todo número decimal pode ser interpretado como uma fração centesimal. Veja a transformação real:</p>
+    <div class="op-fraction-box">
+      <span id="decValue">0.35</span> =
+      <div class="op-fraction">
+        <span class="num" id="fracNum">35</span>
+        <span class="den">100</span>
       </div>
+      = <strong id="pctValue" style="color:#7A00FF">35%</strong>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     DIVISÃO
-     ═══════════════════════════════════════════════════════ -->
-<div class="edu-method-card">
-  <div class="edu-method-header">
-    <span class="edu-method-num" style="background:#FF0055">03</span>
-    <h3 class="edu-method-h2"><i class="fas fa-divide" style="color:#FF0055" aria-hidden="true"></i> Divisão de Decimais</h3>
+<!-- ═══════════════════════════ 03 — DIVISÃO ═══════════════════════════ -->
+<div class="op-bento-card" id="divisao" style="border-top:4px solid #FF0055">
+  <div class="op-card-title">
+    <i class="fa-solid fa-scissors" style="color:#FF0055" aria-hidden="true"></i>
+    3. Divisão com Eliminação de Vírgula
   </div>
 
-  <div class="edu-method-rule">
-    <strong>Método Prático — suprima a vírgula e divida como inteiros:</strong>
+  <div class="op-method-box" style="border-left-color:#FF0055">
+    <strong>Algoritmo de Eliminação de Casos:</strong>
     <ol>
-      <li><strong>Iguale as casas decimais</strong> de dividendo e divisor acrescentando zeros.</li>
-      <li><strong>Suprima as vírgulas</strong> de ambos — agora é uma divisão de inteiros.</li>
-      <li><strong>Execute a divisão normalmente.</strong> Se o dividendo não for múltiplo do divisor, a divisão é não-exata: coloque vírgula no quociente e acrescente zeros ao resto.</li>
+      <li>Igualamos as casas decimais de dividendo e divisor adicionando zeros.</li>
+      <li><strong>Cortamos a vírgula</strong> de ambos, transformando a conta em divisão de inteiros.</li>
+      <li>Se a divisão não for exata, inserimos uma vírgula no quociente e acrescentamos zeros ao resto.</li>
     </ol>
   </div>
 
-  <div class="edu-method-body">
-    <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px">
-      <strong>Terminologia:</strong> <strong>dividendo</strong> é o número a ser dividido. <strong>Divisor</strong> é o número que divide. <strong>Quociente</strong> é o resultado. <strong>Resto</strong> é o que sobra.
-    </p>
-    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--text-mid)">
-      <strong style="color:var(--text)">Atalho:</strong> dividir por <strong>10</strong> → desloca vírgula 1 casa à esquerda. Por <strong>0,01</strong> → desloca 2 casas à direita (equivale a multiplicar por 100).
+  <div class="op-interactive-engine">
+    <div class="op-input-panel">
+      <div class="op-input-group">
+        <label for="div1">Dividendo:</label>
+        <input type="number" id="div1" value="7.5" step="0.1">
+      </div>
+      <div class="op-input-group">
+        <label for="div2">Divisor:</label>
+        <input type="number" id="div2" value="0.25" step="0.01">
+      </div>
     </div>
-    <div class="edu-interactive-engine">
-      <div class="edu-input-panel">
-        <div class="edu-input-group">
-          <label for="div1">Dividendo</label>
-          <input type="number" id="div1" value="7.5" step="0.1" class="edu-input-field">
-        </div>
-        <div class="edu-input-group">
-          <label for="div2">÷ Divisor</label>
-          <input type="number" id="div2" value="0.25" step="0.01" class="edu-input-field">
-        </div>
-      </div>
-      <div class="edu-canvas-panel" style="flex-direction:column;align-items:flex-start;padding-left:30px">
-        <div id="divMethodText" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;font-family:var(--font-m)"></div>
-        <svg id="svgDiv" width="260" height="130" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
-      </div>
+    <div class="op-canvas-panel div-panel">
+      <div id="divMethodText" style="font-size:14px;color:var(--text-dim);margin-bottom:12px;font-family:var(--font-m)"></div>
+      <svg id="svgDiv" width="250" height="140" style="font-family:var(--font-m);font-size:20px;fill:var(--text);overflow:visible"></svg>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     FRAÇÃO → DECIMAL → PORCENTAGEM
-     ═══════════════════════════════════════════════════════ -->
-<div class="edu-method-card">
-  <div class="edu-method-header">
-    <span class="edu-method-num" style="background:#FF9F1C">04</span>
-    <h3 class="edu-method-h2"><i class="fas fa-percent" style="color:#FF9F1C" aria-hidden="true"></i> Fração Ordinária → Decimal → Porcentagem</h3>
+<!-- ═══════════════════════════ 04 — FRAÇÕES ═══════════════════════════ -->
+<div class="op-bento-card" id="fracoes" style="border-top:4px solid #FF9F1C">
+  <div class="op-card-title">
+    <i class="fa-solid fa-infinity" style="color:#FF9F1C" aria-hidden="true"></i>
+    4. Conversão Estrita de Frações para Decimais
   </div>
 
-  <div class="edu-method-rule">
-    <strong>Conversão rigorosa:</strong>
-    <ol>
-      <li><strong>Divida o numerador pelo denominador</strong> — o quociente é o número decimal equivalente.</li>
-      <li>Se a divisão for <strong>exata</strong>, o resultado é um <em>decimal exato</em> (ex: 3/4 = 0,75).</li>
-      <li>Se a divisão for <strong>não-exata com período</strong>, é uma <em>dízima periódica</em>: o dígito ou grupo de dígitos que se repete infinitamente é chamado de <strong>período</strong>.</li>
-      <li><strong>Dízima simples</strong>: período começa logo após a vírgula (ex: 1/3 = 0,333…). <strong>Dízima composta</strong>: há algarismos antes do período (ex: 5/6 = 0,8333…, com parte não-periódica 8).</li>
-      <li>Para a <strong>porcentagem</strong>: multiplique o decimal por 100.</li>
-    </ol>
-  </div>
+  <p style="color:var(--text-mid);margin-bottom:16px;font-size:14px">Toda fração ordinária pode gerar um decimal exato ou uma estrutura periódica continuada (Dízima Periódica). <strong>Dízima Simples:</strong> período começa logo após a vírgula (ex: 1/3 = 0,333…). <strong>Dízima Composta:</strong> há algarismos antes do período (ex: 5/6 = 0,8333…).</p>
 
-  <div class="edu-method-body">
-    <div class="edu-interactive-engine" style="grid-template-columns:1fr">
-      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center;justify-content:space-around;padding:24px">
-        <div style="text-align:center">
-          <span style="font-size:12px;font-weight:700;color:var(--text-dim);font-family:var(--font-m);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:12px">Fração Ordinária</span>
-          <div class="edu-fraction-box" style="justify-content:center">
-            <div class="edu-frac" style="gap:4px">
-              <input type="number" id="fNum" value="1" min="0" style="width:56px;text-align:center;padding:6px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:18px;background:var(--bg-surface);color:var(--text);outline:none;border-bottom:2px solid var(--text)">
-              <input type="number" id="fDen" value="3" min="1" style="width:56px;text-align:center;padding:6px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:18px;background:var(--bg-surface);color:var(--text);outline:none;margin-top:4px">
-            </div>
+  <div class="op-interactive-engine" style="grid-template-columns:1fr">
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-around;padding:24px;background:var(--bg2)">
+
+      <div style="text-align:center">
+        <span style="font-size:13px;font-weight:600;color:var(--text-dim)">Fração Ordinária</span>
+        <div class="op-fraction-box" style="justify-content:center;margin-top:12px">
+          <div class="op-fraction">
+            <input type="number" id="fNum" value="1" style="width:50px;text-align:center;padding:6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:18px;background:var(--bg-surface);color:var(--text);outline:none;border-bottom:2px solid var(--text)">
+            <input type="number" id="fDen" value="3" style="width:50px;text-align:center;padding:6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:18px;background:var(--bg-surface);color:var(--text);outline:none;margin-top:4px">
           </div>
-          <p style="font-size:11px;color:var(--text-dim);margin-top:6px">Numerador ÷ Denominador</p>
         </div>
-
-        <div style="font-size:28px;color:var(--accent-text);font-weight:300;transition:color var(--t-theme)">=</div>
-
-        <div class="edu-frac-result-box">
-          <p style="font-size:11px;color:var(--text-dim);font-family:var(--font-m);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Decimal</p>
-          <div id="fracResult" class="edu-frac-result-val">0,333…</div>
-          <div id="fracType" class="edu-frac-type-badge">Dízima Periódica Simples</div>
-        </div>
-
-        <div style="font-size:28px;color:var(--accent-text);font-weight:300;transition:color var(--t-theme)">=</div>
-
-        <div class="edu-frac-result-box">
-          <p style="font-size:11px;color:var(--text-dim);font-family:var(--font-m);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Porcentagem</p>
-          <div id="fracPct" class="edu-frac-result-val" style="color:var(--accent-text);transition:color var(--t-theme)">33,33%</div>
-          <div style="font-size:11px;color:var(--text-dim);margin-top:8px">decimal × 100</div>
-        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:4px">numerador ÷ denominador</p>
       </div>
+
+      <div style="font-size:28px;color:var(--text-dim)">=</div>
+
+      <div style="text-align:center">
+        <span style="font-size:13px;font-weight:600;color:var(--text-dim)">Resultado Decimal</span>
+        <div id="fracResult" style="font-size:26px;font-family:var(--font-m);font-weight:700;margin-top:12px;color:var(--text)">0,333...</div>
+        <div id="fracType" style="margin-top:10px;display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(255,159,28,0.15);color:#FF9F1C;font-family:var(--font-m);font-size:11px;font-weight:700;letter-spacing:1px">Dízima Periódica Simples</div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -293,125 +379,212 @@ const EDU_MOCK_CONTENT = {
 <script>
 (function(){
   'use strict';
-  var NS = 'http://www.w3.org/2000/svg';
-  function $(id){ return document.getElementById(id); }
-  function mkText(svg, x, y, txt, opts){
-    var t = document.createElementNS(NS,'text');
-    t.setAttribute('x', x); t.setAttribute('y', y);
-    if(opts && opts.anchor) t.setAttribute('text-anchor', opts.anchor);
-    if(opts && opts.fill)   t.setAttribute('fill', opts.fill);
-    if(opts && opts.weight) t.setAttribute('font-weight', opts.weight);
-    if(opts && opts.size)   t.setAttribute('font-size', opts.size);
-    t.textContent = txt;
-    svg.appendChild(t);
-    return t;
-  }
-  function mkLine(svg, x1,y1,x2,y2, color){
-    var l = document.createElementNS(NS,'line');
-    l.setAttribute('x1',x1); l.setAttribute('y1',y1);
-    l.setAttribute('x2',x2); l.setAttribute('y2',y2);
-    l.setAttribute('stroke', color||'currentColor');
-    l.setAttribute('stroke-width','2');
-    svg.appendChild(l);
+  var q = function(id){ return document.getElementById(id); };
+
+  /* ══════════════════════════════════════════════════════════════
+     REPRESENTADOR DE ADIÇÃO E SUBTRAÇÃO (VÍRGULA DEBAIXO DE VÍRGULA)
+     Lógica 100% idêntica ao gemini-code — cor do resultado = accent
+     ══════════════════════════════════════════════════════════════ */
+  function updateAdditionEngine() {
+    var v1 = parseFloat(q('add1').value) || 0;
+    var v2 = parseFloat(q('add2').value) || 0;
+    var op = q('opSelect').value;
+    var res = op === '+' ? v1 + v2 : v1 - v2;
+    var s1 = v1.toString(), s2 = v2.toString();
+    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+    var maxCasas = Math.max(c1, c2);
+    var str1 = v1.toFixed(maxCasas);
+    var str2 = v2.toFixed(maxCasas);
+    var strRes = res.toFixed(maxCasas);
+
+    var svg = q('svgAdd');
+    svg.innerHTML = '';
+    var NS = 'http://www.w3.org/2000/svg';
+    var xEnd = 160;
+
+    var t1 = document.createElementNS(NS, 'text');
+    t1.setAttribute('x', xEnd); t1.setAttribute('y', '40');
+    t1.setAttribute('text-anchor', 'end');
+    t1.textContent = str1;
+    svg.appendChild(t1);
+
+    var t2 = document.createElementNS(NS, 'text');
+    t2.setAttribute('x', xEnd); t2.setAttribute('y', '80');
+    t2.setAttribute('text-anchor', 'end');
+    t2.textContent = op + ' ' + str2;
+    svg.appendChild(t2);
+
+    var line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', '40'); line.setAttribute('y1', '100');
+    line.setAttribute('x2', xEnd + 10); line.setAttribute('y2', '100');
+    line.setAttribute('stroke', 'currentColor'); line.setAttribute('stroke-width', '2');
+    svg.appendChild(line);
+
+    var tRes = document.createElementNS(NS, 'text');
+    tRes.setAttribute('x', xEnd); tRes.setAttribute('y', '135');
+    tRes.setAttribute('text-anchor', 'end');
+    tRes.setAttribute('font-weight', 'bold');
+    tRes.setAttribute('fill', 'var(--accent)');
+    tRes.textContent = strRes;
+    svg.appendChild(tRes);
   }
 
-  /* ── ADIÇÃO / SUBTRAÇÃO ── */
-  function updateAdd(){
-    var v1 = parseFloat($('add1').value)||0;
-    var v2 = parseFloat($('add2').value)||0;
-    var op = $('opSelect').value;
-    var res = op==='+'? v1+v2 : v1-v2;
-    var s1=v1.toString(), s2=v2.toString();
-    var c1=s1.includes('.')?s1.split('.')[1].length:0;
-    var c2=s2.includes('.')?s2.split('.')[1].length:0;
-    var mc=Math.max(c1,c2);
-    var str1=v1.toFixed(mc), str2=v2.toFixed(mc), strR=res.toFixed(mc);
-    var sym=op==='+'?'+':'−';
-    var svg=$('svgAdd'); svg.innerHTML='';
-    var xE=190;
-    mkText(svg,xE,35,str1,{anchor:'end'});
-    mkText(svg,xE,73,sym+' '+str2,{anchor:'end',fill:'#475569'});
-    mkLine(svg,30,86,xE+8,86,'currentColor');
-    mkText(svg,xE,116,strR,{anchor:'end',fill:'var(--accent)',weight:'bold'});
-    var info=$('addInfo');
-    if(info) info.innerHTML='Casas igualadas: '+mc+' &nbsp;|&nbsp; <strong>'+strR+'</strong>';
+  /* ══════════════════════════════════════════════════════════════
+     REPRESENTADOR DE MULTIPLICAÇÃO
+     Cor do resultado = #7A00FF (roxo — cor da operação 02)
+     ══════════════════════════════════════════════════════════════ */
+  function updateMultiplicationEngine() {
+    var f1 = parseFloat(q('mul1').value) || 0;
+    var f2 = parseFloat(q('mul2').value) || 0;
+    var prod = f1 * f2;
+    var s1 = f1.toString(), s2 = f2.toString();
+    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+    var totalCasas = c1 + c2;
+
+    var svg = q('svgMul');
+    svg.innerHTML = '';
+    var NS = 'http://www.w3.org/2000/svg';
+    var xEnd = 160;
+
+    var t1 = document.createElementNS(NS, 'text');
+    t1.setAttribute('x', xEnd); t1.setAttribute('y', '40');
+    t1.setAttribute('text-anchor', 'end');
+    t1.textContent = s1;
+    svg.appendChild(t1);
+
+    var t2 = document.createElementNS(NS, 'text');
+    t2.setAttribute('x', xEnd); t2.setAttribute('y', '80');
+    t2.setAttribute('text-anchor', 'end');
+    t2.textContent = '× ' + s2;
+    svg.appendChild(t2);
+
+    var line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', '50'); line.setAttribute('y1', '100');
+    line.setAttribute('x2', xEnd + 10); line.setAttribute('y2', '100');
+    line.setAttribute('stroke', 'currentColor'); line.setAttribute('stroke-width', '2');
+    svg.appendChild(line);
+
+    var tRes = document.createElementNS(NS, 'text');
+    tRes.setAttribute('x', xEnd); tRes.setAttribute('y', '140');
+    tRes.setAttribute('text-anchor', 'end');
+    tRes.setAttribute('font-weight', 'bold');
+    tRes.setAttribute('fill', '#7A00FF');
+    tRes.textContent = prod.toFixed(totalCasas);
+    svg.appendChild(tRes);
+
+    /* Bloco porcentagem — idêntico ao gemini-code */
+    q('decValue').textContent = f1.toString();
+    q('fracNum').textContent = Math.round(f1 * 100);
+    q('pctValue').textContent = Math.round(f1 * 100) + '%';
   }
 
-  /* ── MULTIPLICAÇÃO ── */
-  function updateMul(){
-    var f1=parseFloat($('mul1').value)||0;
-    var f2=parseFloat($('mul2').value)||0;
-    var prod=f1*f2;
-    var s1=f1.toString(), s2=f2.toString();
-    var c1=s1.includes('.')?s1.split('.')[1].length:0;
-    var c2=s2.includes('.')?s2.split('.')[1].length:0;
-    var tc=c1+c2;
-    var svg=$('svgMul'); svg.innerHTML='';
-    var xE=190;
-    mkText(svg,xE,35,s1,{anchor:'end'});
-    mkText(svg,xE,73,'× '+s2,{anchor:'end',fill:'#475569'});
-    mkLine(svg,30,86,xE+8,86,'currentColor');
-    mkText(svg,xE,116,prod.toFixed(tc),{anchor:'end',fill:'#7A00FF',weight:'bold'});
-    var info=$('mulInfo');
-    if(info) info.innerHTML='Casas: '+c1+'+'+c2+'='+tc+' &nbsp;|&nbsp; <strong>'+prod.toFixed(tc)+'</strong>';
-    // Fração centesimal
-    if($('decValue'))  $('decValue').textContent  = f1.toString().replace('.',',');
-    if($('fracNum'))   $('fracNum').textContent    = Math.round(f1*100);
-    if($('pctValue'))  $('pctValue').textContent   = Math.round(f1*100)+'%';
+  /* ══════════════════════════════════════════════════════════════
+     REPRESENTADOR DE DIVISÃO (MÉTODO PRÁTICO DOS CORTES DE VÍRGULA)
+     Cor do resultado = #FF0055 (vermelho — cor da operação 03)
+     ══════════════════════════════════════════════════════════════ */
+  function updateDivisionEngine() {
+    var d1 = parseFloat(q('div1').value) || 0;
+    var d2 = parseFloat(q('div2').value) || 1;
+    if(d2 === 0) d2 = 1;
+    var s1 = d1.toString(), s2 = d2.toString();
+    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+    var maxCasas = Math.max(c1, c2);
+    var fatorConversao = Math.pow(10, maxCasas);
+    var intDividendo = Math.round(d1 * fatorConversao);
+    var intDivisor = Math.round(d2 * fatorConversao);
+    var quociente = d1 / d2;
+
+    q('divMethodText').innerHTML = 'Ajuste prático (×' + fatorConversao + '): <strong>' + intDividendo + ' : ' + intDivisor + '</strong>';
+
+    var svg = q('svgDiv');
+    svg.innerHTML = '';
+    var NS = 'http://www.w3.org/2000/svg';
+
+    var tDiv = document.createElementNS(NS, 'text');
+    tDiv.setAttribute('x', '30'); tDiv.setAttribute('y', '40');
+    tDiv.textContent = intDividendo;
+    svg.appendChild(tDiv);
+
+    var tDis = document.createElementNS(NS, 'text');
+    tDis.setAttribute('x', '140'); tDis.setAttribute('y', '40');
+    tDis.textContent = intDivisor;
+    svg.appendChild(tDis);
+
+    var vLine = document.createElementNS(NS, 'line');
+    vLine.setAttribute('x1', '125'); vLine.setAttribute('y1', '15');
+    vLine.setAttribute('x2', '125'); vLine.setAttribute('y2', '90');
+    vLine.setAttribute('stroke', 'currentColor'); vLine.setAttribute('stroke-width', '2');
+    svg.appendChild(vLine);
+
+    var hLine = document.createElementNS(NS, 'line');
+    hLine.setAttribute('x1', '125'); hLine.setAttribute('y1', '50');
+    hLine.setAttribute('x2', '220'); hLine.setAttribute('y2', '50');
+    hLine.setAttribute('stroke', 'currentColor'); hLine.setAttribute('stroke-width', '2');
+    svg.appendChild(hLine);
+
+    var tQuo = document.createElementNS(NS, 'text');
+    tQuo.setAttribute('x', '140'); tQuo.setAttribute('y', '80');
+    tQuo.setAttribute('font-weight', 'bold');
+    tQuo.setAttribute('fill', '#FF0055');
+    tQuo.textContent = Number(quociente.toFixed(3));
+    svg.appendChild(tQuo);
   }
 
-  /* ── DIVISÃO ── */
-  function updateDiv(){
-    var d1=parseFloat($('div1').value)||0;
-    var d2=parseFloat($('div2').value)||1;
-    if(d2===0) d2=1;
-    var s1=d1.toString(), s2=d2.toString();
-    var c1=s1.includes('.')?s1.split('.')[1].length:0;
-    var c2=s2.includes('.')?s2.split('.')[1].length:0;
-    var mc=Math.max(c1,c2), fator=Math.pow(10,mc);
-    var intD=Math.round(d1*fator), intDv=Math.round(d2*fator);
-    var quot=d1/d2;
-    var mt=$('divMethodText');
-    if(mt) mt.innerHTML='Ajuste ×'+fator+': <strong style="color:var(--text)">'+intD+' ÷ '+intDv+'</strong>';
-    var svg=$('svgDiv'); svg.innerHTML='';
-    mkText(svg,22,40,String(intD),{});
-    mkText(svg,150,40,String(intDv),{});
-    mkLine(svg,130,14,130,90,'currentColor');
-    mkLine(svg,130,48,240,48,'currentColor');
-    mkText(svg,150,80,String(Number(quot.toFixed(4))),{fill:'#FF0055',weight:'bold'});
-  }
-
-  /* ── FRAÇÃO ── */
-  function updateFrac(){
-    var num=parseInt($('fNum').value)||0;
-    var den=parseInt($('fDen').value)||1;
-    if(den===0) den=1;
-    var dec=num/den, ds=dec.toString();
-    var isDiz = ds.length>9 && ds.includes('.');
-    var pct=(dec*100);
-    var pctStr=Number.isInteger(pct)?pct+'%':pct.toFixed(2)+'%';
-    var tipo='Decimal Exato';
-    if(!ds.includes('.')) tipo='Número Inteiro';
-    else if(isDiz){
-      var decPart=ds.split('.')[1]||'';
-      tipo=decPart.length>=6?'Dízima Periódica Simples':'Dízima Periódica Composta';
+  /* ══════════════════════════════════════════════════════════════
+     CONVERSOR DE FRAÇÕES ORDINÁRIAS PARA DÍZIMAS E DECIMAIS
+     Cor do badge = #FF9F1C (laranja — cor da operação 04)
+     ══════════════════════════════════════════════════════════════ */
+  function updateFractionEngine() {
+    var num = parseInt(q('fNum').value) || 0;
+    var den = parseInt(q('fDen').value) || 1;
+    if(den === 0) {
+      q('fracResult').textContent = 'Erro (Denom = 0)';
+      q('fracType').textContent = '-';
+      return;
     }
-    var disp=isDiz?dec.toFixed(5)+'…':ds.replace('.',',');
-    if($('fracResult')) $('fracResult').textContent=disp;
-    if($('fracType'))   $('fracType').textContent=tipo;
-    if($('fracPct'))    $('fracPct').textContent=pctStr;
+    var res = num / den;
+    var resStr = res.toString();
+    q('fracResult').textContent = resStr.length > 8 ? res.toFixed(5) + '...' : resStr;
+    if(!resStr.includes('.')) {
+      q('fracType').textContent = 'Inteiro Exato';
+    } else {
+      var decimalPart = resStr.split('.')[1];
+      if(decimalPart.length < 6) {
+        q('fracType').textContent = 'Decimal Exato';
+        q('fracType').style.background = 'rgba(0,201,173,0.15)';
+        q('fracType').style.color = '#00c9ad';
+      } else {
+        q('fracType').textContent = num % 2 === 0 ? 'Dízima Periódica Composta' : 'Dízima Periódica Simples';
+        q('fracType').style.background = 'rgba(255,159,28,0.15)';
+        q('fracType').style.color = '#FF9F1C';
+      }
+    }
   }
 
-  function addEv(id,fn){var el=$(id);if(el)el.addEventListener('input',fn);}
-  function init(){
-    addEv('add1',updateAdd); addEv('add2',updateAdd); addEv('opSelect',updateAdd);
-    addEv('mul1',updateMul); addEv('mul2',updateMul);
-    addEv('div1',updateDiv); addEv('div2',updateDiv);
-    addEv('fNum',updateFrac); addEv('fDen',updateFrac);
-    updateAdd(); updateMul(); updateDiv(); updateFrac();
+  /* ══════════════════════════════════════════════════════════════
+     ORQUESTRAÇÃO DE EVENTOS (STARTUP) — idêntico ao gemini-code
+     ══════════════════════════════════════════════════════════════ */
+  function initOp() {
+    q('add1').addEventListener('input', updateAdditionEngine);
+    q('add2').addEventListener('input', updateAdditionEngine);
+    q('opSelect').addEventListener('change', updateAdditionEngine);
+    q('mul1').addEventListener('input', updateMultiplicationEngine);
+    q('mul2').addEventListener('input', updateMultiplicationEngine);
+    q('div1').addEventListener('input', updateDivisionEngine);
+    q('div2').addEventListener('input', updateDivisionEngine);
+    q('fNum').addEventListener('input', updateFractionEngine);
+    q('fDen').addEventListener('input', updateFractionEngine);
+    updateAdditionEngine();
+    updateMultiplicationEngine();
+    updateDivisionEngine();
+    updateFractionEngine();
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
-  else init();
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initOp);
+  else initOp();
 })();
 </script>`,
     },
