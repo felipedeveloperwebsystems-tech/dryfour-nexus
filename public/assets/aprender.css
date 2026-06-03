@@ -46,6 +46,8 @@
   transition: transform var(--t) var(--ease), box-shadow var(--t);
   will-change: transform;
   z-index: 500;
+  /* DESKTOP: sempre visível — transform zerado explicitamente */
+  transform: translateX(0) !important;
 }
 
 /* ===================================================================
@@ -598,4 +600,169 @@
   .edu-quick-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .edu-quick-card { padding: 16px 10px; }
   .edu-quick-name { font-size: 12px; }
+}
+
+/* ===================================================================
+   SIMULADORES INTERATIVOS DE MATEMÁTICA
+   Estilos dos cards de operações decimais injetados pelo edu_content
+   =================================================================== */
+
+/* Card container de cada operação */
+.edu-math-card {
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 28px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t), border-color var(--t);
+}
+.edu-math-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-mid);
+}
+
+/* Header do card: badge numerado + título */
+.edu-math-card-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 24px; background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+}
+.edu-math-op-badge {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 16px; color: #fff;
+  flex-shrink: 0; transition: background var(--t-theme);
+}
+.edu-math-op-add  { background: var(--accent); }
+.edu-math-op-mul  { background: #7A00FF; }
+.edu-math-op-div  { background: #FF0055; }
+.edu-math-op-frac { background: #FF9F1C; }
+.edu-math-title {
+  font-family: var(--font-d); font-size: 20px; color: var(--text);
+  display: flex; align-items: center; gap: 8px; margin: 0;
+}
+.edu-math-title i { font-size: 14px; color: var(--accent-text); transition: color var(--t-theme); }
+
+/* Regra de ouro da operação */
+.edu-math-rule {
+  padding: 12px 24px; font-size: 13px; color: var(--text-mid);
+  background: var(--accent-dim); border-bottom: 1px solid var(--border2);
+  line-height: 1.6; transition: background var(--t-theme);
+}
+.edu-math-rule strong { color: var(--text); }
+.edu-math-rule em { color: var(--accent-text); font-style: normal; font-weight: 600; }
+
+/* Engine: inputs + visual lado a lado */
+.edu-math-engine {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  min-height: 160px;
+}
+.edu-math-inputs {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 20px; border-right: 1px solid var(--border2);
+  background: var(--bg2);
+}
+.edu-math-input-group {
+  display: flex; flex-direction: column; gap: 5px;
+}
+.edu-math-input-group label {
+  font-family: var(--font-m); font-size: 10px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+}
+.edu-math-input {
+  padding: 9px 12px; border: 1px solid var(--border2);
+  border-radius: var(--r-sm); font-family: var(--font-m); font-size: 15px;
+  background: var(--bg-surface); color: var(--text); outline: none;
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.edu-math-input:focus {
+  border-color: var(--accent-mid);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.edu-math-select {
+  padding: 9px 12px; border: 1px solid var(--border2);
+  border-radius: var(--r-sm); font-family: var(--font-m); font-size: 13px;
+  background: var(--bg-surface); color: var(--text); outline: none;
+  cursor: pointer;
+}
+
+/* Área visual: resultado renderizado */
+.edu-math-visual {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px; padding: 24px;
+}
+
+/* Linhas da conta */
+.edu-mc-row {
+  font-family: var(--font-m); font-size: 22px; color: var(--text);
+  text-align: right; width: 100%; max-width: 200px;
+  letter-spacing: 0.5px;
+}
+.edu-mc-op { color: var(--text-mid); }
+.edu-mc-line {
+  width: 100%; max-width: 200px; height: 2px;
+  background: var(--text); border-radius: 1px; margin: 2px 0;
+}
+.edu-mc-result {
+  font-weight: 700; color: var(--accent-text);
+  font-size: 24px; transition: color var(--t-theme);
+}
+
+/* Divisão — formato horizontal */
+.edu-mc-division {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-m); font-size: 20px; flex-wrap: wrap;
+  justify-content: center;
+}
+.edu-mc-dividend, .edu-mc-divisor { color: var(--text); }
+.edu-mc-divbar { color: var(--text-mid); }
+.edu-mc-equals { color: var(--text-dim); }
+.edu-mc-quotient { color: var(--accent-text); font-weight: 700; transition: color var(--t-theme); }
+
+/* Fração → Decimal → Porcentagem */
+.edu-mc-frac-row {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-m); flex-wrap: wrap; justify-content: center;
+}
+.edu-mc-frac {
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: 2px; font-size: 20px;
+}
+.edu-mc-frac-num { padding: 0 8px; border-bottom: 2px solid var(--text); }
+.edu-mc-frac-den { padding: 0 8px; }
+.edu-mc-frac-line { display: none; }
+.edu-mc-dec { font-size: 20px; color: var(--text); font-weight: 600; }
+.edu-mc-pct { font-size: 22px; color: var(--accent-text); font-weight: 700; transition: color var(--t-theme); }
+
+/* Tags de informação */
+.edu-math-tags {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.edu-mc-tag {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: 20px;
+  font-family: var(--font-m); font-size: 11px;
+  background: var(--bg3); color: var(--text-mid);
+  border: 1px solid var(--border2);
+}
+.edu-mc-tag--ok {
+  background: var(--accent-dim); color: var(--accent-text);
+  border-color: var(--accent-mid); font-weight: 700;
+  transition: all var(--t-theme);
+}
+
+/* Mobile: engine em coluna única */
+@media (max-width: 768px) {
+  .edu-math-engine { grid-template-columns: 1fr; }
+  .edu-math-inputs { border-right: none; border-bottom: 1px solid var(--border2); }
+  .edu-mc-row { font-size: 18px; }
+  .edu-mc-result { font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .edu-math-card-header { padding: 14px 16px; }
+  .edu-math-inputs { padding: 16px; }
+  .edu-math-visual { padding: 16px; }
 }

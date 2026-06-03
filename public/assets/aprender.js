@@ -66,44 +66,227 @@ const EDU_SUBJECTS = {
    ================================================================ */
 const EDU_MOCK_CONTENT = {
   matematica: {
+    'Operações': {
+      title: 'Operações com Números Decimais',
+      summary: 'Adição, subtração, multiplicação e divisão com decimais — simuladores visuais interativos.',
+      difficulty: 'iniciante', duration_min: 25,
+      content: `
+<h2>Operações com Números Decimais</h2>
+<p>Os números decimais estão em toda situação real: preços, medidas, porcentagens. Use os simuladores abaixo para visualizar cada operação passo a passo, em tempo real. Modifique os valores e observe o resultado se adaptar automaticamente.</p>
+
+<div class="edu-math-card">
+  <div class="edu-math-card-header">
+    <span class="edu-math-op-badge edu-math-op-add">01</span>
+    <h3 class="edu-math-title"><i class="fas fa-plus-minus" aria-hidden="true"></i> Adição e Subtração</h3>
+  </div>
+  <div class="edu-math-rule">
+    <strong>Regra:</strong> iguale as casas decimais com zeros à direita, alinhe <em>vírgula abaixo de vírgula</em> e opere normalmente.
+  </div>
+  <div class="edu-math-engine">
+    <div class="edu-math-inputs">
+      <div class="edu-math-input-group">
+        <label for="em-add1">Primeiro número</label>
+        <input type="number" id="em-add1" value="14.38" step="0.01" class="edu-math-input">
+      </div>
+      <div class="edu-math-input-group">
+        <label for="em-op">Operação</label>
+        <select id="em-op" class="edu-math-select">
+          <option value="+">Adição (+)</option>
+          <option value="-">Subtração (−)</option>
+        </select>
+      </div>
+      <div class="edu-math-input-group">
+        <label for="em-add2">Segundo número</label>
+        <input type="number" id="em-add2" value="5.60" step="0.01" class="edu-math-input">
+      </div>
+    </div>
+    <div class="edu-math-visual">
+      <div class="edu-math-calc" id="em-add-calc"></div>
+      <div class="edu-math-tags" id="em-add-explain"></div>
+    </div>
+  </div>
+</div>
+
+<div class="edu-math-card">
+  <div class="edu-math-card-header">
+    <span class="edu-math-op-badge edu-math-op-mul">02</span>
+    <h3 class="edu-math-title"><i class="fas fa-xmark" aria-hidden="true"></i> Multiplicação</h3>
+  </div>
+  <div class="edu-math-rule">
+    <strong>Regra:</strong> multiplique como inteiros. Depois some o total de casas decimais dos dois fatores e posicione a vírgula no produto da direita para a esquerda.
+  </div>
+  <div class="edu-math-engine">
+    <div class="edu-math-inputs">
+      <div class="edu-math-input-group">
+        <label for="em-mul1">Fator A</label>
+        <input type="number" id="em-mul1" value="3.45" step="0.01" class="edu-math-input">
+      </div>
+      <div class="edu-math-input-group">
+        <label for="em-mul2">× Fator B</label>
+        <input type="number" id="em-mul2" value="2.1" step="0.1" class="edu-math-input">
+      </div>
+    </div>
+    <div class="edu-math-visual">
+      <div class="edu-math-calc" id="em-mul-calc"></div>
+      <div class="edu-math-tags" id="em-mul-explain"></div>
+    </div>
+  </div>
+</div>
+
+<div class="edu-math-card">
+  <div class="edu-math-card-header">
+    <span class="edu-math-op-badge edu-math-op-div">03</span>
+    <h3 class="edu-math-title"><i class="fas fa-divide" aria-hidden="true"></i> Divisão</h3>
+  </div>
+  <div class="edu-math-rule">
+    <strong>Regra:</strong> iguale as casas decimais dos dois com zeros, depois <em>corte a vírgula</em> de ambos — divisão de inteiros normal.
+  </div>
+  <div class="edu-math-engine">
+    <div class="edu-math-inputs">
+      <div class="edu-math-input-group">
+        <label for="em-div1">Dividendo</label>
+        <input type="number" id="em-div1" value="7.5" step="0.1" class="edu-math-input">
+      </div>
+      <div class="edu-math-input-group">
+        <label for="em-div2">÷ Divisor</label>
+        <input type="number" id="em-div2" value="0.25" step="0.01" class="edu-math-input">
+      </div>
+    </div>
+    <div class="edu-math-visual">
+      <div class="edu-math-calc" id="em-div-calc"></div>
+      <div class="edu-math-tags" id="em-div-explain"></div>
+    </div>
+  </div>
+</div>
+
+<div class="edu-math-card">
+  <div class="edu-math-card-header">
+    <span class="edu-math-op-badge edu-math-op-frac">04</span>
+    <h3 class="edu-math-title"><i class="fas fa-percent" aria-hidden="true"></i> Fração → Decimal → Porcentagem</h3>
+  </div>
+  <div class="edu-math-rule">
+    <strong>Regra:</strong> divida numerador pelo denominador. Multiplique por 100 para a porcentagem. Decimais que repetem infinitamente são dízimas periódicas.
+  </div>
+  <div class="edu-math-engine">
+    <div class="edu-math-inputs">
+      <div class="edu-math-input-group">
+        <label for="em-fnum">Numerador</label>
+        <input type="number" id="em-fnum" value="1" min="0" class="edu-math-input">
+      </div>
+      <div class="edu-math-input-group">
+        <label for="em-fden">Denominador</label>
+        <input type="number" id="em-fden" value="3" min="1" class="edu-math-input">
+      </div>
+    </div>
+    <div class="edu-math-visual">
+      <div class="edu-math-calc" id="em-frac-calc"></div>
+      <div class="edu-math-tags" id="em-frac-explain"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+
+  function renderAdd(){
+    var v1=parseFloat($('em-add1').value)||0, v2=parseFloat($('em-add2').value)||0;
+    var op=$('em-op').value, res=op==='+'?v1+v2:v1-v2;
+    var s1=v1.toString(),s2=v2.toString();
+    var c1=s1.includes('.')?s1.split('.')[1].length:0;
+    var c2=s2.includes('.')?s2.split('.')[1].length:0;
+    var mc=Math.max(c1,c2);
+    var sym=op==='+'?'+':'−';
+    $('em-add-calc').innerHTML='<div class="edu-mc-row">'+v1.toFixed(mc)+'</div><div class="edu-mc-row edu-mc-op">'+sym+' '+v2.toFixed(mc)+'</div><div class="edu-mc-line"></div><div class="edu-mc-row edu-mc-result">'+res.toFixed(mc)+'</div>';
+    $('em-add-explain').innerHTML='<span class="edu-mc-tag">'+mc+' casas decimais</span><span class="edu-mc-tag edu-mc-tag--ok">= '+res.toFixed(mc)+'</span>';
+  }
+
+  function renderMul(){
+    var f1=parseFloat($('em-mul1').value)||0, f2=parseFloat($('em-mul2').value)||0;
+    var prod=f1*f2;
+    var s1=f1.toString(),s2=f2.toString();
+    var c1=s1.includes('.')?s1.split('.')[1].length:0;
+    var c2=s2.includes('.')?s2.split('.')[1].length:0;
+    var tc=c1+c2;
+    $('em-mul-calc').innerHTML='<div class="edu-mc-row">'+s1+'</div><div class="edu-mc-row edu-mc-op">× '+s2+'</div><div class="edu-mc-line"></div><div class="edu-mc-row edu-mc-result">'+prod.toFixed(tc)+'</div>';
+    $('em-mul-explain').innerHTML='<span class="edu-mc-tag">A: '+c1+' casas</span><span class="edu-mc-tag">B: '+c2+' casas</span><span class="edu-mc-tag">Total: '+tc+'</span><span class="edu-mc-tag edu-mc-tag--ok">= '+prod.toFixed(tc)+'</span>';
+  }
+
+  function renderDiv(){
+    var d1=parseFloat($('em-div1').value)||0, d2=parseFloat($('em-div2').value)||1;
+    var s1=d1.toString(),s2=d2.toString();
+    var c1=s1.includes('.')?s1.split('.')[1].length:0;
+    var c2=s2.includes('.')?s2.split('.')[1].length:0;
+    var mc=Math.max(c1,c2), fator=Math.pow(10,mc);
+    var intD=Math.round(d1*fator), intDv=Math.round(d2*fator);
+    var quot=d1/d2;
+    $('em-div-calc').innerHTML='<div class="edu-mc-division"><span class="edu-mc-dividend">'+intD+'</span><span class="edu-mc-divbar"> ÷ </span><span class="edu-mc-divisor">'+intDv+'</span><span class="edu-mc-equals"> = </span><span class="edu-mc-quotient">'+Number(quot.toFixed(6))+'</span></div>';
+    $('em-div-explain').innerHTML='<span class="edu-mc-tag">×'+fator+' remove as vírgulas</span><span class="edu-mc-tag edu-mc-tag--ok">= '+Number(quot.toFixed(6))+'</span>';
+  }
+
+  function renderFrac(){
+    var num=parseInt($('em-fnum').value)||0, den=parseInt($('em-fden').value)||1;
+    if(den===0)return;
+    var dec=num/den, ds=dec.toString(), isDiz=ds.length>8;
+    var pct=(dec*100).toFixed(2);
+    var tipo=!ds.includes('.')? 'Número Inteiro' : isDiz? 'Dízima Periódica' : 'Decimal Exato';
+    $('em-frac-calc').innerHTML='<div class="edu-mc-frac-row"><div class="edu-mc-frac"><span class="edu-mc-frac-num">'+num+'</span><span class="edu-mc-frac-line"></span><span class="edu-mc-frac-den">'+den+'</span></div><span class="edu-mc-equals">=</span><span class="edu-mc-dec">'+(isDiz?dec.toFixed(5)+'…':ds)+'</span><span class="edu-mc-equals">=</span><span class="edu-mc-pct">'+pct+'%</span></div>';
+    $('em-frac-explain').innerHTML='<span class="edu-mc-tag">'+tipo+'</span><span class="edu-mc-tag edu-mc-tag--ok">'+pct+'% do total</span>';
+  }
+
+  function init(){
+    ['em-add1','em-add2','em-op'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderAdd);});
+    ['em-mul1','em-mul2'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderMul);});
+    ['em-div1','em-div2'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderDiv);});
+    ['em-fnum','em-fden'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',renderFrac);});
+    renderAdd();renderMul();renderDiv();renderFrac();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>`,
+    },
     'Frações': {
-      title: 'Frações: do básico ao avançado',
+      title: 'Frações: tipos, operações e simplificação',
       summary: 'Aprenda frações do zero: tipos, operações e aplicações no dia a dia.',
       difficulty: 'iniciante', duration_min: 15,
       content: `<h2>O que são frações?</h2>
 <p>Uma fração representa uma ou mais partes de um todo. É escrita na forma <strong>a/b</strong>, onde <strong>a</strong> é o numerador e <strong>b</strong> o denominador (b ≠ 0).</p>
 <h3>Tipos de frações</h3>
 <ul>
-  <li><strong>Própria:</strong> numerador menor que denominador (ex: 3/4)</li>
-  <li><strong>Imprópria:</strong> numerador maior que denominador (ex: 5/3)</li>
-  <li><strong>Aparente:</strong> resultado inteiro (ex: 6/2 = 3)</li>
-  <li><strong>Mista:</strong> número inteiro + fração (ex: 1 2/3)</li>
+  <li><strong>Própria:</strong> numerador menor que denominador — ex: 3/4</li>
+  <li><strong>Imprópria:</strong> numerador maior — ex: 5/3</li>
+  <li><strong>Aparente:</strong> resultado inteiro — ex: 6/2 = 3</li>
+  <li><strong>Mista:</strong> inteiro + fração — ex: 1 2/3</li>
 </ul>
-<h2>Operações com frações</h2>
-<h3>Adição com denominadores iguais</h3>
-<p>Basta somar os numeradores: <code>3/8 + 2/8 = 5/8</code></p>
-<h3>Adição com denominadores diferentes</h3>
-<p>Encontre o MMC dos denominadores e transforme as frações equivalentes:</p>
+<h2>Adição e subtração</h2>
+<p><strong>Denominadores iguais:</strong> some os numeradores: <code>3/8 + 2/8 = 5/8</code></p>
+<p><strong>Denominadores diferentes:</strong> calcule o MMC e transforme:</p>
 <pre>1/2 + 1/3 = 3/6 + 2/6 = 5/6</pre>
-<h3>Multiplicação</h3>
-<p>Multiplique numerador com numerador e denominador com denominador:</p>
+<h2>Multiplicação e divisão</h2>
+<p><strong>Multiplicação:</strong> num × num e den × den:</p>
 <pre>3/4 × 2/5 = 6/20 = 3/10</pre>
-<h3>Divisão</h3>
-<p>Mantenha a primeira fração e multiplique pelo inverso da segunda:</p>
-<pre>3/4 ÷ 2/5 = 3/4 × 5/2 = 15/8</pre>`,
+<p><strong>Divisão:</strong> mantenha a primeira, inverta a segunda:</p>
+<pre>3/4 ÷ 2/5 = 3/4 × 5/2 = 15/8</pre>
+<h2>Simplificação</h2>
+<p>Divida pelo MDC (Máximo Divisor Comum):</p>
+<pre>12/18 → MDC = 6 → 2/3</pre>`,
     },
     'Porcentagem': {
       title: 'Porcentagem: cálculos essenciais',
       summary: 'Domine porcentagem para o dia a dia, concursos e ENEM.',
       difficulty: 'iniciante', duration_min: 20,
       content: `<h2>O que é porcentagem?</h2>
-<p>Porcentagem (%) significa "por cento" — ou seja, por cem. É uma forma de expressar uma proporção em relação a 100.</p>
+<p>Porcentagem (%) significa "por cento" — proporção em relação a 100.</p>
 <h3>Cálculo básico</h3>
-<p>Para calcular <strong>x% de N</strong>: multiplique N por x e divida por 100.</p>
 <pre>20% de 150 = 150 × 20 / 100 = 30</pre>
 <h3>Aumento percentual</h3>
-<pre>Novo valor = Valor original × (1 + taxa/100)
-150 com 20% de aumento = 150 × 1,20 = 180</pre>`,
+<pre>150 com 20% de aumento = 150 × 1,20 = 180</pre>
+<h3>Desconto percentual</h3>
+<pre>R$ 400 com 15% de desconto = 400 × 0,85 = R$ 340</pre>
+<h3>Variação percentual</h3>
+<pre>De 200 para 250: ((250−200)/200) × 100 = 25%</pre>`,
     },
   },
   programacao: {

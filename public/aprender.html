@@ -15,8 +15,10 @@
       background: #F5F7FA; color: #0F172A; margin: 0; padding: 0;
       font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden;
     }
-    /* Edu sidebar fechado antes do CSS carregar */
-    .edu-sidebar { transform: translateX(-105%); }
+    /* Edu sidebar — fechado antes do CSS carregar APENAS no mobile */
+    @media (max-width: 1024px) {
+      .edu-sidebar { transform: translateX(-105%); }
+    }
     .edu-skeleton {
       background: linear-gradient(90deg, #e8edf5 25%, #f0f4fa 50%, #e8edf5 75%);
       background-size: 200% 100%; animation: eduShimmer 1.4s ease-in-out infinite;
