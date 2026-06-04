@@ -858,17 +858,24 @@ const EduContentModule = {
         ? content.content
         : (content.content || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
 
-      // CRÍTICO: <script> dentro de innerHTML NÃO executa automaticamente no browser.
-      // Precisa extrair e re-executar cada script manualmente.
-      bodyEl.querySelectorAll('script').forEach(oldScript => {
-        const newScript = document.createElement('script');
-        // Copia atributos (type, src…)
-        Array.from(oldScript.attributes).forEach(attr =>
-          newScript.setAttribute(attr.name, attr.value)
-        );
-        newScript.textContent = oldScript.textContent;
-        oldScript.parentNode.replaceChild(newScript, oldScript);
-      });
+      // CRÍTICO: <script> via innerHTML não executa no browser.
+      // Coletar todos os scripts ANTES de qualquer replaceChild,
+      // depois re-executar via setTimeout(0) para garantir que o
+      // DOM dos inputs (add1, add2, mul1…) já foi parseado e existe.
+      const inlineScripts = Array.from(bodyEl.querySelectorAll('script'));
+      inlineScripts.forEach(old => old.remove()); // remove os inativos do DOM
+
+      setTimeout(() => {
+        inlineScripts.forEach(oldScript => {
+          const newScript = document.createElement('script');
+          Array.from(oldScript.attributes).forEach(attr =>
+            newScript.setAttribute(attr.name, attr.value)
+          );
+          newScript.textContent = oldScript.textContent;
+          document.body.appendChild(newScript); // append no body — DOM já completo
+          newScript.remove(); // limpa após execução
+        });
+      }, 0);
     }
 
     // Afiliado contextual
