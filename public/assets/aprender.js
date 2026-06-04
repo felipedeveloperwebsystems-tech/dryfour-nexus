@@ -71,33 +71,9 @@ const EDU_MOCK_CONTENT = {
       summary: 'Domine as quatro operações com decimais. Modifique os valores e veja o resultado calculado em tempo real no SVG.',
       difficulty: 'iniciante', duration_min: 35,
       content: `
-<style>
-.op-bento-card{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px 32px;box-shadow:var(--shadow-sm);margin-bottom:32px;transition:box-shadow var(--t)}
-.op-bento-card:hover{box-shadow:var(--shadow-md)}
-.op-card-title{font-family:var(--font-d);font-size:22px;margin-bottom:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border2);padding-bottom:14px;color:var(--text)}
-.op-method-box{background:var(--bg2);border-left:4px solid var(--accent);padding:14px 18px;border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:22px;transition:border-color var(--t-theme),background var(--t-theme)}
-.op-method-box ol{padding-left:20px;color:var(--text-mid);margin-top:6px}
-.op-method-box li{margin-bottom:5px;font-size:14px;line-height:1.6}
-.op-engine{display:grid;grid-template-columns:320px 1fr;gap:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:20px;margin-top:18px}
-.op-ipanel{display:flex;flex-direction:column;gap:16px}
-.op-igroup{display:flex;flex-direction:column;gap:6px}
-.op-igroup label{font-size:13px;font-weight:600;color:var(--text-mid)}
-.op-igroup input,.op-igroup select{padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:15px;outline:none;background:var(--bg-surface);color:var(--text);transition:border-color .2s;width:100%}
-.op-igroup input:focus,.op-igroup select:focus{border-color:var(--accent-mid)}
-.op-cpanel{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-sm);display:flex;justify-content:center;align-items:center;min-height:220px;padding:16px}
-.op-cpanel.div-panel{flex-direction:column;align-items:flex-start;padding-left:40px}
-.op-fbox{display:flex;align-items:center;gap:16px;font-size:18px;margin:16px 0;font-family:var(--font-m);flex-wrap:wrap}
-.op-frac{display:inline-flex;flex-direction:column;align-items:center;text-align:center}
-.op-frac .num{border-bottom:2px solid var(--text);padding:0 6px}
-.op-frac .den{padding:0 6px}
-@media(max-width:768px){.op-engine{grid-template-columns:1fr;gap:16px;padding:14px}.op-cpanel{min-height:180px}.op-cpanel.div-panel{padding-left:16px}.op-bento-card{padding:18px 14px}}
-@media(max-width:480px){.op-card-title{font-size:17px}.op-igroup input,.op-igroup select{font-size:14px}}
-</style>
-
 <h2>O que são Números Decimais?</h2>
 <p>Números decimais são racionais escritos com vírgula separando a <strong>parte inteira</strong> da <strong>parte fracionária</strong>. Todo decimal é uma fração com denominador potência de 10. Ex: 3,75 = 375/100. <strong>Casas decimais</strong>: quantidade de algarismos após a vírgula.</p>
 
-<!-- ADIÇÃO / SUBTRAÇÃO ================================================ -->
 <div class="op-bento-card" style="border-top:4px solid var(--accent)">
   <div class="op-card-title">
     <i class="fa-solid fa-calculator" style="color:var(--accent-text)" aria-hidden="true"></i>
@@ -135,7 +111,6 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
-<!-- MULTIPLICAÇÃO ===================================================== -->
 <div class="op-bento-card" style="border-top:4px solid #7A00FF">
   <div class="op-card-title">
     <i class="fa-solid fa-square-sliders" style="color:#7A00FF" aria-hidden="true"></i>
@@ -175,7 +150,6 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
-<!-- DIVISÃO =========================================================== -->
 <div class="op-bento-card" style="border-top:4px solid #FF0055">
   <div class="op-card-title">
     <i class="fa-solid fa-scissors" style="color:#FF0055" aria-hidden="true"></i>
@@ -207,7 +181,6 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
-<!-- FRAÇÕES =========================================================== -->
 <div class="op-bento-card" style="border-top:4px solid #FF9F1C">
   <div class="op-card-title">
     <i class="fa-solid fa-infinity" style="color:#FF9F1C" aria-hidden="true"></i>
@@ -233,102 +206,7 @@ const EDU_MOCK_CONTENT = {
       </div>
     </div>
   </div>
-</div>
-
-<script>
-/* Engines idênticas ao gemini-code — só cores dos resultados diferem por operação */
-(function(){
-  var Q = document.getElementById.bind(document);
-
-  function updateAdditionEngine() {
-    var v1 = parseFloat(Q('add1').value) || 0;
-    var v2 = parseFloat(Q('add2').value) || 0;
-    var op = Q('opSelect').value;
-    var res = op === '+' ? v1 + v2 : v1 - v2;
-    var s1 = v1.toString(), s2 = v2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var maxCasas = Math.max(c1, c2);
-    var str1 = v1.toFixed(maxCasas), str2 = v2.toFixed(maxCasas), strRes = res.toFixed(maxCasas);
-    var svg = Q('svgAdd'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg', xEnd = 160;
-    var t1 = document.createElementNS(NS,'text'); t1.setAttribute('x',xEnd); t1.setAttribute('y','40'); t1.setAttribute('text-anchor','end'); t1.textContent = str1; svg.appendChild(t1);
-    var t2 = document.createElementNS(NS,'text'); t2.setAttribute('x',xEnd); t2.setAttribute('y','80'); t2.setAttribute('text-anchor','end'); t2.textContent = op+' '+str2; svg.appendChild(t2);
-    var ln = document.createElementNS(NS,'line'); ln.setAttribute('x1','40'); ln.setAttribute('y1','100'); ln.setAttribute('x2',xEnd+10); ln.setAttribute('y2','100'); ln.setAttribute('stroke','currentColor'); ln.setAttribute('stroke-width','2'); svg.appendChild(ln);
-    var tr = document.createElementNS(NS,'text'); tr.setAttribute('x',xEnd); tr.setAttribute('y','135'); tr.setAttribute('text-anchor','end'); tr.setAttribute('font-weight','bold'); tr.setAttribute('fill','var(--accent)'); tr.textContent = strRes; svg.appendChild(tr);
-  }
-
-  function updateMultiplicationEngine() {
-    var f1 = parseFloat(Q('mul1').value) || 0, f2 = parseFloat(Q('mul2').value) || 0;
-    var prod = f1 * f2;
-    var s1 = f1.toString(), s2 = f2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var totalCasas = c1 + c2;
-    var svg = Q('svgMul'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg', xEnd = 160;
-    var t1 = document.createElementNS(NS,'text'); t1.setAttribute('x',xEnd); t1.setAttribute('y','40'); t1.setAttribute('text-anchor','end'); t1.textContent = s1; svg.appendChild(t1);
-    var t2 = document.createElementNS(NS,'text'); t2.setAttribute('x',xEnd); t2.setAttribute('y','80'); t2.setAttribute('text-anchor','end'); t2.textContent = '× '+s2; svg.appendChild(t2);
-    var ln = document.createElementNS(NS,'line'); ln.setAttribute('x1','50'); ln.setAttribute('y1','100'); ln.setAttribute('x2',xEnd+10); ln.setAttribute('y2','100'); ln.setAttribute('stroke','currentColor'); ln.setAttribute('stroke-width','2'); svg.appendChild(ln);
-    var tr = document.createElementNS(NS,'text'); tr.setAttribute('x',xEnd); tr.setAttribute('y','140'); tr.setAttribute('text-anchor','end'); tr.setAttribute('font-weight','bold'); tr.setAttribute('fill','#7A00FF'); tr.textContent = prod.toFixed(totalCasas); svg.appendChild(tr);
-    Q('decValue').textContent = f1.toString();
-    Q('fracNum').textContent = Math.round(f1 * 100);
-    Q('pctValue').textContent = Math.round(f1 * 100) + '%';
-  }
-
-  function updateDivisionEngine() {
-    var d1 = parseFloat(Q('div1').value) || 0, d2 = parseFloat(Q('div2').value) || 1;
-    if(d2 === 0) d2 = 1;
-    var s1 = d1.toString(), s2 = d2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var maxCasas = Math.max(c1, c2);
-    var fatorConversao = Math.pow(10, maxCasas);
-    var intDividendo = Math.round(d1 * fatorConversao), intDivisor = Math.round(d2 * fatorConversao);
-    var quociente = d1 / d2;
-    var dm = Q('divMethodText'); if(dm) dm.innerHTML = 'Ajuste pr\xe1tico (\xd7'+fatorConversao+'): <strong>'+intDividendo+' : '+intDivisor+'</strong>';
-    var svg = Q('svgDiv'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg';
-    var tD = document.createElementNS(NS,'text'); tD.setAttribute('x','30'); tD.setAttribute('y','40'); tD.textContent = intDividendo; svg.appendChild(tD);
-    var tDi = document.createElementNS(NS,'text'); tDi.setAttribute('x','140'); tDi.setAttribute('y','40'); tDi.textContent = intDivisor; svg.appendChild(tDi);
-    var vl = document.createElementNS(NS,'line'); vl.setAttribute('x1','125'); vl.setAttribute('y1','15'); vl.setAttribute('x2','125'); vl.setAttribute('y2','90'); vl.setAttribute('stroke','currentColor'); vl.setAttribute('stroke-width','2'); svg.appendChild(vl);
-    var hl = document.createElementNS(NS,'line'); hl.setAttribute('x1','125'); hl.setAttribute('y1','50'); hl.setAttribute('x2','220'); hl.setAttribute('y2','50'); hl.setAttribute('stroke','currentColor'); hl.setAttribute('stroke-width','2'); svg.appendChild(hl);
-    var tQ = document.createElementNS(NS,'text'); tQ.setAttribute('x','140'); tQ.setAttribute('y','80'); tQ.setAttribute('font-weight','bold'); tQ.setAttribute('fill','#FF0055'); tQ.textContent = Number(quociente.toFixed(3)); svg.appendChild(tQ);
-  }
-
-  function updateFractionEngine() {
-    var num = parseInt(Q('fNum').value) || 0, den = parseInt(Q('fDen').value) || 1;
-    if(den === 0) { Q('fracResult').textContent = 'Erro (Denom=0)'; Q('fracType').textContent = '-'; return; }
-    var res = num / den, resStr = res.toString();
-    Q('fracResult').textContent = resStr.length > 8 ? res.toFixed(5) + '...' : resStr;
-    var ft = Q('fracType'); if(!ft) return;
-    if(!resStr.includes('.')) { ft.textContent = 'Inteiro Exato'; ft.style.background='rgba(0,201,173,.15)'; ft.style.color='#00c9ad'; }
-    else { var dp = resStr.split('.')[1];
-      if(dp.length < 6) { ft.textContent='Decimal Exato'; ft.style.background='rgba(0,201,173,.15)'; ft.style.color='#00c9ad'; }
-      else { ft.textContent = num%2===0?'D\xedzima Peri\xf3dica Composta':'D\xedzima Peri\xf3dica Simples'; ft.style.background='rgba(255,159,28,.15)'; ft.style.color='#FF9F1C'; }
-    }
-  }
-
-  /* Orquestração idêntica ao gemini-code */
-  function ev(id, evt, fn){ var el=Q(id); if(el) el.addEventListener(evt, fn); }
-  ev('add1','input',updateAdditionEngine);
-  ev('add2','input',updateAdditionEngine);
-  ev('opSelect','change',updateAdditionEngine);
-  ev('mul1','input',updateMultiplicationEngine);
-  ev('mul2','input',updateMultiplicationEngine);
-  ev('div1','input',updateDivisionEngine);
-  ev('div2','input',updateDivisionEngine);
-  ev('fNum','input',updateFractionEngine);
-  ev('fDen','input',updateFractionEngine);
-  updateAdditionEngine();
-  updateMultiplicationEngine();
-  updateDivisionEngine();
-  updateFractionEngine();
-})();
-</script>`,
+</div>`,
     },
 
     'Frações': {
@@ -858,24 +736,11 @@ const EduContentModule = {
         ? content.content
         : (content.content || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
 
-      // CRÍTICO: <script> via innerHTML não executa no browser.
-      // Coletar todos os scripts ANTES de qualquer replaceChild,
-      // depois re-executar via setTimeout(0) para garantir que o
-      // DOM dos inputs (add1, add2, mul1…) já foi parseado e existe.
-      const inlineScripts = Array.from(bodyEl.querySelectorAll('script'));
-      inlineScripts.forEach(old => old.remove()); // remove os inativos do DOM
-
-      setTimeout(() => {
-        inlineScripts.forEach(oldScript => {
-          const newScript = document.createElement('script');
-          Array.from(oldScript.attributes).forEach(attr =>
-            newScript.setAttribute(attr.name, attr.value)
-          );
-          newScript.textContent = oldScript.textContent;
-          document.body.appendChild(newScript); // append no body — DOM já completo
-          newScript.remove(); // limpa após execução
-        });
-      }, 0);
+      // Se o tópico tem simuladores matemáticos, inicializa via módulo externo.
+      // JS no aprender.js (não inline no content) — executa 100% garantido.
+      if (topic === 'Operações' && subject === 'matematica') {
+        MathSimulatorModule.init();
+      }
     }
 
     // Afiliado contextual
@@ -998,6 +863,143 @@ const HeaderModule = {
 /* ================================================================
    BUSCA DE SUBJECTS NA API
    ================================================================ */
+
+/* ================================================================
+   MATH SIMULATOR MODULE
+   Inicializa as 4 calculadoras do tópico Operações.
+   Chamado pelo EduContentModule.load() após innerHTML estar no DOM.
+   ================================================================ */
+const MathSimulatorModule = {
+  init() {
+    const Q  = id => document.getElementById(id);
+    const NS = 'http://www.w3.org/2000/svg';
+
+    function mkText(svg, x, y, txt, fill, weight) {
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y);
+      t.setAttribute('text-anchor', 'end');
+      if (fill)   t.setAttribute('fill', fill);
+      if (weight) t.setAttribute('font-weight', weight);
+      t.textContent = txt;
+      svg.appendChild(t);
+    }
+    function mkTextLeft(svg, x, y, txt) {
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y);
+      t.textContent = txt;
+      svg.appendChild(t);
+    }
+    function mkLine(svg, x1, y1, x2, y2) {
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+      l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+      l.setAttribute('stroke', 'currentColor');
+      l.setAttribute('stroke-width', '2');
+      svg.appendChild(l);
+    }
+
+    /* ── ADIÇÃO / SUBTRAÇÃO ── */
+    function updateAdd() {
+      const v1 = parseFloat(Q('add1').value) || 0;
+      const v2 = parseFloat(Q('add2').value) || 0;
+      const op = Q('opSelect').value;
+      const res = op === '+' ? v1 + v2 : v1 - v2;
+      const c1 = v1.toString().includes('.') ? v1.toString().split('.')[1].length : 0;
+      const c2 = v2.toString().includes('.') ? v2.toString().split('.')[1].length : 0;
+      const mc = Math.max(c1, c2);
+      const svg = Q('svgAdd'); if (!svg) return;
+      svg.innerHTML = '';
+      mkText(svg, 160, 40,  v1.toFixed(mc));
+      mkText(svg, 160, 80,  op + ' ' + v2.toFixed(mc));
+      mkLine(svg, 40, 100, 170, 100);
+      mkText(svg, 160, 135, res.toFixed(mc), 'var(--accent)', 'bold');
+    }
+
+    /* ── MULTIPLICAÇÃO ── */
+    function updateMul() {
+      const f1 = parseFloat(Q('mul1').value) || 0;
+      const f2 = parseFloat(Q('mul2').value) || 0;
+      const prod = f1 * f2;
+      const c1 = f1.toString().includes('.') ? f1.toString().split('.')[1].length : 0;
+      const c2 = f2.toString().includes('.') ? f2.toString().split('.')[1].length : 0;
+      const svg = Q('svgMul'); if (!svg) return;
+      svg.innerHTML = '';
+      mkText(svg, 160, 40,  f1.toString());
+      mkText(svg, 160, 80,  '× ' + f2.toString());
+      mkLine(svg, 50, 100, 170, 100);
+      mkText(svg, 160, 140, prod.toFixed(c1 + c2), '#7A00FF', 'bold');
+      const dv = Q('decValue');  if (dv) dv.textContent = f1.toString();
+      const fn = Q('fracNum');   if (fn) fn.textContent  = Math.round(f1 * 100);
+      const pv = Q('pctValue');  if (pv) pv.textContent  = Math.round(f1 * 100) + '%';
+    }
+
+    /* ── DIVISÃO ── */
+    function updateDiv() {
+      const d1 = parseFloat(Q('div1').value) || 0;
+      let   d2 = parseFloat(Q('div2').value) || 1;
+      if (d2 === 0) d2 = 1;
+      const c1 = d1.toString().includes('.') ? d1.toString().split('.')[1].length : 0;
+      const c2 = d2.toString().includes('.') ? d2.toString().split('.')[1].length : 0;
+      const mc = Math.max(c1, c2);
+      const fator  = Math.pow(10, mc);
+      const intD   = Math.round(d1 * fator);
+      const intDv  = Math.round(d2 * fator);
+      const quot   = d1 / d2;
+      const dm = Q('divMethodText');
+      if (dm) dm.innerHTML = 'Ajuste prático (×' + fator + '): <strong>' + intD + ' : ' + intDv + '</strong>';
+      const svg = Q('svgDiv'); if (!svg) return;
+      svg.innerHTML = '';
+      mkTextLeft(svg, 30,  40, String(intD));
+      mkTextLeft(svg, 140, 40, String(intDv));
+      mkLine(svg, 125, 15, 125, 90);
+      mkLine(svg, 125, 50, 220, 50);
+      const tQ = document.createElementNS(NS, 'text');
+      tQ.setAttribute('x', '140'); tQ.setAttribute('y', '80');
+      tQ.setAttribute('font-weight', 'bold'); tQ.setAttribute('fill', '#FF0055');
+      tQ.textContent = String(Number(quot.toFixed(3)));
+      svg.appendChild(tQ);
+    }
+
+    /* ── FRAÇÕES ── */
+    function updateFrac() {
+      const num = parseInt(Q('fNum').value) || 0;
+      let   den = parseInt(Q('fDen').value) || 1;
+      if (den === 0) den = 1;
+      const res = num / den;
+      const rs  = res.toString();
+      const fr  = Q('fracResult'); if (fr) fr.textContent = rs.length > 8 ? res.toFixed(5) + '...' : rs;
+      const ft  = Q('fracType');   if (!ft) return;
+      if (!rs.includes('.')) {
+        ft.textContent = 'Inteiro Exato';
+        ft.style.background = 'rgba(0,201,173,.15)'; ft.style.color = '#00c9ad';
+      } else {
+        const dp = rs.split('.')[1];
+        if (dp.length < 6) {
+          ft.textContent = 'Decimal Exato';
+          ft.style.background = 'rgba(0,201,173,.15)'; ft.style.color = '#00c9ad';
+        } else {
+          ft.textContent = num % 2 === 0 ? 'Dízima Periódica Composta' : 'Dízima Periódica Simples';
+          ft.style.background = 'rgba(255,159,28,.15)'; ft.style.color = '#FF9F1C';
+        }
+      }
+    }
+
+    /* ── BIND + RENDER INICIAL ── */
+    const on = (id, evt, fn) => { const el = Q(id); if (el) el.addEventListener(evt, fn); };
+    on('add1',     'input',  updateAdd);
+    on('add2',     'input',  updateAdd);
+    on('opSelect', 'change', updateAdd);
+    on('mul1',     'input',  updateMul);
+    on('mul2',     'input',  updateMul);
+    on('div1',     'input',  updateDiv);
+    on('div2',     'input',  updateDiv);
+    on('fNum',     'input',  updateFrac);
+    on('fDen',     'input',  updateFrac);
+
+    updateAdd(); updateMul(); updateDiv(); updateFrac();
+  },
+};
+
 async function fetchEduSubjects() {
   try {
     const res = await fetch('/api/subjects?category=aprender');
