@@ -158,6 +158,14 @@ func route(w http.ResponseWriter, r *http.Request) {
 	case path == "/api/categories" || path == "/api/categories/":
 		withCORS(handleCategories)(w, r)
 
+	// GET /api/subjects?category=aprender — FASE 1 NOVO
+	case path == "/api/subjects" || path == "/api/subjects/":
+		withCORS(handleSubjects)(w, r)
+
+	// GET /api/edu?subject=matematica&topic=Frações — FASE 1 NOVO
+	case path == "/api/edu" || path == "/api/edu/":
+		withCORS(handleEdu)(w, r)
+
 	// GET /api/news/{id} — path com ID numérico
 	case strings.HasPrefix(path, "/api/news/") && len(path) > len("/api/news/"):
 		withCORS(handleNewsByID)(w, r)
@@ -232,6 +240,18 @@ func handleNews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := r.URL.Query()
+
+	// FASE 1: suporte a ?slug= para busca por artigo individual via slug
+	// Usado por artigo.js quando a URL tem ?slug=drywall-3-sistema-modular-brasil
+	if slug := strings.TrimSpace(q.Get("slug")); slug != "" {
+		post, err := models.GetBySlug(slug)
+		if err != nil {
+			writeError(w, http.StatusNotFound, "Artigo não encontrado")
+			return
+		}
+		writeJSON(w, http.StatusOK, apiResponse{Success: true, Data: post})
+		return
+	}
 
 	// Parse e sanitização de parâmetros
 	niche := strings.ToLower(strings.TrimSpace(q.Get("niche")))
@@ -371,5 +391,73 @@ func handleCategories(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, apiResponse{
 		Success: true,
 		Data:    cats,
+	})
+}
+
+
+// ================================================================
+// HANDLER: GET /api/subjects
+// Parâmetros: category (slug da categoria, ex: "aprender")
+//
+// Retorna lista de subjects (disciplinas) filtrados por categoria.
+// Usado pelo aprender.js para montar o sidebar dinamicamente.
+// FASE 1 — NOVO
+// ================================================================
+
+func handleSubjects(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Método não permitido")
+		return
+	}
+
+	category := strings.TrimSpace(r.URL.Query().Get("category"))
+
+	subjects, err := models.GetSubjectsByCategory(category)
+	if err != nil {
+		log.Printf("[DRYFOUR-BLOG] GetSubjectsByCategory error: %v", err)
+		writeError(w, http.StatusInternalServerError, "Erro ao buscar disciplinas")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, apiResponse{
+		Success: true,
+		Data:    subjects,
+	})
+}
+
+// ================================================================
+// HANDLER: GET /api/edu
+// Parâmetros: subject (slug), topic (nome do tópico), group (nome do grupo)
+//
+// Retorna o conteúdo educacional de um tópico específico.
+// Usado pelo aprender.js no EduContentModule.load().
+// FASE 1 — NOVO
+// ================================================================
+
+func handleEdu(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Método não permitido")
+		return
+	}
+
+	q := r.URL.Query()
+	subject := strings.TrimSpace(q.Get("subject"))
+	topic   := strings.TrimSpace(q.Get("topic"))
+
+	if subject == "" || topic == "" {
+		writeError(w, http.StatusBadRequest, "Parâmetros 'subject' e 'topic' são obrigatórios")
+		return
+	}
+
+	edu, err := models.GetEduContent(subject, topic)
+	if err != nil {
+		log.Printf("[DRYFOUR-BLOG] GetEduContent error: %v", err)
+		writeError(w, http.StatusInternalServerError, "Erro ao buscar conteúdo educacional")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, apiResponse{
+		Success: true,
+		Data:    edu,
 	})
 }

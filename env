@@ -1,0 +1,22 @@
+# ============================================================
+# DRYFOUR BLOG — .env
+# Variáveis de ambiente para desenvolvimento local
+# NUNCA commitar esse arquivo no Git — já está no .gitignore
+# Para Vercel: usar "vercel env add NEON_DATABASE_URL"
+# ============================================================
+
+# === BANCO DE DADOS (Neon PostgreSQL) ===
+# String de conexão real do Neon — endpoint pooler removido
+# O pgxpool gerencia o pool internamente, não use o -pooler do Neon
+# channel_binding=require removido — incompatível com pgx/v5 pool
+NEON_DATABASE_URL=postgresql://neondb_owner:npg_Inr9gvF6ANSb@ep-solitary-mouse-apcl1k4i.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require
+
+# === SERVIDOR LOCAL ===
+PORT=8080
+PUBLIC_DIR=./public
+
+# === AMBIENTE ===
+GO_ENV=development
+
+# === SEGURANÇA (futuro: JWT para painel admin) ===
+JWT_SECRET=sua_chave_secreta_aqui_min_32_chars

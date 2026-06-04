@@ -370,3 +370,50 @@ func getDBPostByID(id int) (*Post, error) {
 
 	return &p, nil
 }
+
+// GetBySlug retorna um post pelo slug único.
+// Usado para URLs semânticas: /artigo.html?slug=drywall-3-sistema-modular-brasil
+// Fallback automático para mock se DB não estiver conectado.
+func GetBySlug(slug string) (*Post, error) {
+	if slug == "" {
+		return nil, fmt.Errorf("slug não pode ser vazio")
+	}
+	if !database.IsConnected() {
+		for _, p := range mockPosts {
+			if p.Slug == slug {
+				post := p // cópia local para evitar ponteiro para slice
+				return &post, nil
+			}
+		}
+		return nil, fmt.Errorf("post com slug '%s' não encontrado", slug)
+	}
+	return getDBPostBySlug(slug)
+}
+
+func getDBPostBySlug(slug string) (*Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var p Post
+	err := database.DB.QueryRow(ctx, `
+		SELECT id, title, slug, excerpt, content, niche, author, img_url,
+		       read_time, views, comments, is_featured, is_popular, published_at
+		FROM posts WHERE slug = $1
+	`, slug).Scan(
+		&p.ID, &p.Title, &p.Slug, &p.Excerpt, &p.Content, &p.Niche, &p.Author,
+		&p.ImgURL, &p.ReadTime, &p.Views, &p.Comments,
+		&p.IsFeatured, &p.IsPopular, &p.PublishedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("get post by slug: %w", err)
+	}
+
+	// Incrementa view count de forma assíncrona (não bloqueia a response)
+	go func() {
+		ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel2()
+		_, _ = database.DB.Exec(ctx2, "UPDATE posts SET views = views + 1 WHERE id = $1", p.ID)
+	}()
+
+	return &p, nil
+}

@@ -104,17 +104,17 @@ async function fetchArticle() {
   if (!slug && !id) return null;
 
   try {
-    // Tenta buscar pela lista filtrada por slug
+    // FASE 1: busca direta por slug — rota GET /api/news?slug=
+    // Mais eficiente que baixar a lista inteira e filtrar no frontend
     if (slug) {
-      const res = await fetch(`/api/news`);
+      const res = await fetch(`/api/news?slug=${encodeURIComponent(slug)}`);
       if (res.ok) {
         const json = await res.json();
-        const found = (json.data || []).find(a => a.slug === slug);
-        if (found) return found;
+        if (json.success && json.data) return json.data;
       }
     }
 
-    // Tenta buscar por ID direto
+    // Fallback: busca por ID (compatibilidade com URLs antigas ?id=1)
     if (id) {
       const res = await fetch(`/api/news/${id}`);
       if (res.ok) {
@@ -134,7 +134,11 @@ async function fetchArticle() {
    INCREMENTA VIEW COUNT (fire and forget)
    ================================================================ */
 function trackView(id) {
-  // Envia view para a API de forma assíncrona sem bloquear o render
+  // FASE 2: sessionStorage evita dupla contagem na mesma sessão
+  const key = `viewed_${id}`;
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+  // Fire-and-forget — não bloqueia o render
   fetch(`/api/news/${id}`, { method: 'GET' }).catch(() => {});
 }
 
@@ -167,10 +171,51 @@ function renderArticle(art) {
   // ── Aplica tema de nicho ──
   document.body.className = `art-page ${cfg.bodyClass}`;
 
-  // ── Meta tags SEO ──
+  // ── Meta tags SEO básicos ──
   document.title = `${art.title} | Dryfour Blog`;
   qs('#metaDesc')?.setAttribute('content', art.excerpt || art.title);
   qs('#metaAuthor')?.setAttribute('content', art.author || 'Dryfour Blog');
+
+  // ── FASE 2: Open Graph dinâmico ──
+  // Atualiza og:title e og:description que estão no <head> do artigo.html
+  const setMeta = (sel, val) => {
+    const el = document.querySelector(sel);
+    if (el) el.setAttribute('content', val);
+  };
+  setMeta('meta[property="og:title"]',       art.title);
+  setMeta('meta[property="og:description"]', art.excerpt || art.title);
+  setMeta('meta[property="og:image"]',       art.img_url || '');
+  setMeta('meta[property="og:url"]',         window.location.href);
+  setMeta('meta[property="og:type"]',        'article');
+
+  // ── FASE 2: JSON-LD BlogPosting dinâmico ──
+  // Remove JSON-LD anterior se existir (evita duplicatas na troca de artigo)
+  const oldLD = document.querySelector('script[type="application/ld+json"][data-article]');
+  if (oldLD) oldLD.remove();
+  const ldScript = document.createElement('script');
+  ldScript.type = 'application/ld+json';
+  ldScript.dataset.article = 'true';
+  ldScript.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type':    'BlogPosting',
+    'headline':      art.title,
+    'image':         art.img_url || '',
+    'description':   art.excerpt || art.title,
+    'datePublished': art.published_at,
+    'dateModified':  art.published_at,
+    'author': {
+      '@type': 'Person',
+      'name':  art.author || 'Dryfour Blog Editorial',
+    },
+    'publisher': {
+      '@type': 'Organization',
+      'name':  'Dryfour Blog',
+      'url':   'https://dryfour-nexus.vercel.app',
+    },
+    'url':       window.location.href,
+    'inLanguage': 'pt-BR',
+  });
+  document.head.appendChild(ldScript);
 
   // ── Breadcrumb ──
   const bcNiche = qs('#artBcNiche');
@@ -278,7 +323,7 @@ function renderRelated(articles, currentId) {
   };
 
   container.innerHTML = articles.map(a => `
-    <a href="/artigo.html?id=${a.id}" class="art-related-item" aria-label="${a.title}">
+    <a href="/artigo.html?slug=${a.slug || a.id}" class="art-related-item" aria-label="${a.title}">
       <img src="${a.img_url || 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=120&q=60'}"
         alt="${a.title}" class="art-related-img" loading="lazy" width="52" height="52">
       <div class="art-related-info">
