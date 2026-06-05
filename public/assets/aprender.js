@@ -704,15 +704,21 @@ const EduContentModule = {
     view.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Tenta buscar da API
+    // EXCEÇÃO: tópicos com simuladores interativos usam sempre o mock
+    // para garantir que o HTML das ferramentas esteja presente.
+    const MOCK_ONLY_TOPICS = { matematica: ['Operações'] };
+    const isMockOnly = MOCK_ONLY_TOPICS[subject]?.includes(topic);
     let content = null;
-    try {
-      const res = await fetch(`/api/edu?subject=${subject}&group=${encodeURIComponent(group)}&topic=${encodeURIComponent(topic)}`);
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) content = json.data;
+    if (!isMockOnly) {
+      try {
+        const res = await fetch(`/api/edu?subject=${subject}&group=${encodeURIComponent(group)}&topic=${encodeURIComponent(topic)}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) content = json.data;
+        }
+      } catch(e) {
+        console.warn('[DRYFOUR-BLOG] API edu indisponível — usando mock', e);
       }
-    } catch(e) {
-      console.warn('[DRYFOUR-BLOG] API edu indisponível — usando mock', e);
     }
 
     // Fallback para mock
@@ -875,8 +881,10 @@ const HeaderModule = {
    ================================================================ */
 const MathSimulatorModule = {
   init() {
-    // Atalhos auxiliares de manipulação do DOM
-    const query = el => document.querySelector(el);
+    // Busca dentro do #eduBody — garante que encontra os elementos
+    // mesmo que o documento tenha múltiplos estados de render
+    const root  = document.getElementById('eduBody') || document;
+    const query = el => root.querySelector(el);
     
     /* ====================================================================
        REPRESENTADOR DE ADIÇÃO E SUBTRAÇÃO (VÍRGULA DEBAIXO DE VÍRGULA)
