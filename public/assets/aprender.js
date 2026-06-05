@@ -68,10 +68,9 @@ const EDU_MOCK_CONTENT = {
   matematica: {
     'Operações': {
       title: 'Operações com Números Decimais',
-      summary: 'Domine as quatro operações com decimais. Modifique os valores e veja o resultado calculado em tempo real no SVG.',
+      summary: 'Domine as quatro operações com decimais. Modifique os valores e veja o resultado calculado em tempo real.',
       difficulty: 'iniciante', duration_min: 35,
       content: `
-
 <h2>O que são Números Decimais?</h2>
 <p>Números decimais são racionais escritos com vírgula separando a <strong>parte inteira</strong> da <strong>parte fracionária</strong>. Todo decimal é uma fração com denominador potência de 10. Ex: 3,75 = 375/100. <strong>Casas decimais</strong>: quantidade de algarismos após a vírgula.</p>
 
@@ -211,9 +210,8 @@ const EDU_MOCK_CONTENT = {
       </div>
     </div>
   </div>
-</div>
-
-`,
+</div>`
+    },
 
     'Frações': {
       title: 'Frações: tipos, operações e simplificação',
@@ -742,8 +740,7 @@ const EduContentModule = {
         ? content.content
         : (content.content || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
 
-      // Módulos interativos: JS externo no aprender.js em vez de inline no content
-      // Garante execução 100% após innerHTML estar no DOM
+      // Simuladores matemáticos: JS no módulo externo, não inline no content
       if (topic === 'Operações' && subject === 'matematica') {
         MathSimulatorModule.init();
       }
@@ -872,9 +869,9 @@ const HeaderModule = {
 
 /* ================================================================
    MATH SIMULATOR MODULE
-   Funções extraídas 1:1 do gemini-code.html.
-   CSS das classes .op-* está no aprender.css (não inline).
-   Chamado por EduContentModule.load() quando topic === 'Operações'.
+   Funções extraídas 1:1 do gemini-code.html (query + createElementNS)
+   CSS .op-* está no aprender.css. Chamado por EduContentModule.load()
+   quando topic === 'Operações' e o innerHTML já está no DOM.
    ================================================================ */
 const MathSimulatorModule = {
   init() {
@@ -1085,7 +1082,7 @@ const MathSimulatorModule = {
        ORQUESTRAÇÃO DE EVENTOS (STARTUP)
        ==================================================================== */
 
-    // Registra eventos e faz render inicial
+    // Eventos e render inicial (mesmo do gemini-code DOMContentLoaded)
     // Inputs Adição/Subtração
     query('#add1').addEventListener('input', updateAdditionEngine);
     query('#add2').addEventListener('input', updateAdditionEngine);
@@ -1199,6 +1196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 5. Log debug
-  console.log('%c📚 DRYFOUR BLOG — Aprender+', 'color:var(--accent,#00E5FF);font-weight:bold;font-size:14px');
-  console.log('%c10 disciplinas | Sidebar multinível | Temas dinâmicos | API + Fallback', 'color:#475569;font-size:11px');
+  console.log('%c📚 DRYFOUR BLOG — Aprender+ v3.1 [MathSimulatorModule ATIVO]', 'color:var(--accent,#00E5FF);font-weight:bold;font-size:14px');
+  console.log('%c10 disciplinas | Sidebar multinível | Temas dinâmicos | API + Fallback | Operações OK', 'color:#475569;font-size:11px');
+  console.log('[DRYFOUR] MathSimulatorModule:', typeof MathSimulatorModule, '| init:', typeof MathSimulatorModule?.init);
 });

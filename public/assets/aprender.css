@@ -881,12 +881,7 @@
   .edu-method-body { padding: 14px 16px; }
 }
 
-/* ================================================================
-   CALCULADORAS OPERAÇÕES MATEMÁTICAS — .op-*
-   Extraído do <style> original do mock Operações.
-   Movido para cá: <style> via innerHTML é ignorado pelo browser.
-   As funções JS estão no MathSimulatorModule em aprender.js.
-   ================================================================ */
+/* === CALCULADORAS OPERAÇÕES .op-* === */
 .op-bento-card{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px 32px;box-shadow:var(--shadow-sm);margin-bottom:32px;transition:box-shadow var(--t)}
 .op-bento-card:hover{box-shadow:var(--shadow-md)}
 .op-card-title{font-family:var(--font-d);font-size:22px;margin-bottom:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border2);padding-bottom:14px;color:var(--text)}
