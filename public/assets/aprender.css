@@ -880,3 +880,30 @@
   .edu-method-header { padding: 12px 14px; }
   .edu-method-body { padding: 14px 16px; }
 }
+
+/* ================================================================
+   CALCULADORAS OPERAÇÕES MATEMÁTICAS — .op-*
+   Extraído do <style> original do mock Operações.
+   Movido para cá: <style> via innerHTML é ignorado pelo browser.
+   As funções JS estão no MathSimulatorModule em aprender.js.
+   ================================================================ */
+.op-bento-card{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px 32px;box-shadow:var(--shadow-sm);margin-bottom:32px;transition:box-shadow var(--t)}
+.op-bento-card:hover{box-shadow:var(--shadow-md)}
+.op-card-title{font-family:var(--font-d);font-size:22px;margin-bottom:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border2);padding-bottom:14px;color:var(--text)}
+.op-method-box{background:var(--bg2);border-left:4px solid var(--accent);padding:14px 18px;border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:22px;transition:border-color var(--t-theme),background var(--t-theme)}
+.op-method-box ol{padding-left:20px;color:var(--text-mid);margin-top:6px}
+.op-method-box li{margin-bottom:5px;font-size:14px;line-height:1.6}
+.op-engine{display:grid;grid-template-columns:320px 1fr;gap:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:20px;margin-top:18px}
+.op-ipanel{display:flex;flex-direction:column;gap:16px}
+.op-igroup{display:flex;flex-direction:column;gap:6px}
+.op-igroup label{font-size:13px;font-weight:600;color:var(--text-mid)}
+.op-igroup input,.op-igroup select{padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:15px;outline:none;background:var(--bg-surface);color:var(--text);transition:border-color .2s;width:100%}
+.op-igroup input:focus,.op-igroup select:focus{border-color:var(--accent-mid)}
+.op-cpanel{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-sm);display:flex;justify-content:center;align-items:center;min-height:220px;padding:16px}
+.op-cpanel.div-panel{flex-direction:column;align-items:flex-start;padding-left:40px}
+.op-fbox{display:flex;align-items:center;gap:16px;font-size:18px;margin:16px 0;font-family:var(--font-m);flex-wrap:wrap}
+.op-frac{display:inline-flex;flex-direction:column;align-items:center;text-align:center}
+.op-frac .num{border-bottom:2px solid var(--text);padding:0 6px}
+.op-frac .den{padding:0 6px}
+@media(max-width:768px){.op-engine{grid-template-columns:1fr;gap:16px;padding:14px}.op-cpanel{min-height:180px}.op-cpanel.div-panel{padding-left:16px}.op-bento-card{padding:18px 14px}}
+@media(max-width:480px){.op-card-title{font-size:17px}.op-igroup input,.op-igroup select{font-size:14px}}

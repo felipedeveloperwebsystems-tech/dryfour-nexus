@@ -71,28 +71,6 @@ const EDU_MOCK_CONTENT = {
       summary: 'Domine as quatro operações com decimais. Modifique os valores e veja o resultado calculado em tempo real no SVG.',
       difficulty: 'iniciante', duration_min: 35,
       content: `
-<style>
-.op-bento-card{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px 32px;box-shadow:var(--shadow-sm);margin-bottom:32px;transition:box-shadow var(--t)}
-.op-bento-card:hover{box-shadow:var(--shadow-md)}
-.op-card-title{font-family:var(--font-d);font-size:22px;margin-bottom:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border2);padding-bottom:14px;color:var(--text)}
-.op-method-box{background:var(--bg2);border-left:4px solid var(--accent);padding:14px 18px;border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:22px;transition:border-color var(--t-theme),background var(--t-theme)}
-.op-method-box ol{padding-left:20px;color:var(--text-mid);margin-top:6px}
-.op-method-box li{margin-bottom:5px;font-size:14px;line-height:1.6}
-.op-engine{display:grid;grid-template-columns:320px 1fr;gap:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:20px;margin-top:18px}
-.op-ipanel{display:flex;flex-direction:column;gap:16px}
-.op-igroup{display:flex;flex-direction:column;gap:6px}
-.op-igroup label{font-size:13px;font-weight:600;color:var(--text-mid)}
-.op-igroup input,.op-igroup select{padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font-m);font-size:15px;outline:none;background:var(--bg-surface);color:var(--text);transition:border-color .2s;width:100%}
-.op-igroup input:focus,.op-igroup select:focus{border-color:var(--accent-mid)}
-.op-cpanel{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--r-sm);display:flex;justify-content:center;align-items:center;min-height:220px;padding:16px}
-.op-cpanel.div-panel{flex-direction:column;align-items:flex-start;padding-left:40px}
-.op-fbox{display:flex;align-items:center;gap:16px;font-size:18px;margin:16px 0;font-family:var(--font-m);flex-wrap:wrap}
-.op-frac{display:inline-flex;flex-direction:column;align-items:center;text-align:center}
-.op-frac .num{border-bottom:2px solid var(--text);padding:0 6px}
-.op-frac .den{padding:0 6px}
-@media(max-width:768px){.op-engine{grid-template-columns:1fr;gap:16px;padding:14px}.op-cpanel{min-height:180px}.op-cpanel.div-panel{padding-left:16px}.op-bento-card{padding:18px 14px}}
-@media(max-width:480px){.op-card-title{font-size:17px}.op-igroup input,.op-igroup select{font-size:14px}}
-</style>
 
 <h2>O que são Números Decimais?</h2>
 <p>Números decimais são racionais escritos com vírgula separando a <strong>parte inteira</strong> da <strong>parte fracionária</strong>. Todo decimal é uma fração com denominador potência de 10. Ex: 3,75 = 375/100. <strong>Casas decimais</strong>: quantidade de algarismos após a vírgula.</p>
@@ -235,101 +213,7 @@ const EDU_MOCK_CONTENT = {
   </div>
 </div>
 
-<script>
-/* Engines idênticas ao gemini-code — só cores dos resultados diferem por operação */
-(function(){
-  var Q = document.getElementById.bind(document);
-
-  function updateAdditionEngine() {
-    var v1 = parseFloat(Q('add1').value) || 0;
-    var v2 = parseFloat(Q('add2').value) || 0;
-    var op = Q('opSelect').value;
-    var res = op === '+' ? v1 + v2 : v1 - v2;
-    var s1 = v1.toString(), s2 = v2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var maxCasas = Math.max(c1, c2);
-    var str1 = v1.toFixed(maxCasas), str2 = v2.toFixed(maxCasas), strRes = res.toFixed(maxCasas);
-    var svg = Q('svgAdd'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg', xEnd = 160;
-    var t1 = document.createElementNS(NS,'text'); t1.setAttribute('x',xEnd); t1.setAttribute('y','40'); t1.setAttribute('text-anchor','end'); t1.textContent = str1; svg.appendChild(t1);
-    var t2 = document.createElementNS(NS,'text'); t2.setAttribute('x',xEnd); t2.setAttribute('y','80'); t2.setAttribute('text-anchor','end'); t2.textContent = op+' '+str2; svg.appendChild(t2);
-    var ln = document.createElementNS(NS,'line'); ln.setAttribute('x1','40'); ln.setAttribute('y1','100'); ln.setAttribute('x2',xEnd+10); ln.setAttribute('y2','100'); ln.setAttribute('stroke','currentColor'); ln.setAttribute('stroke-width','2'); svg.appendChild(ln);
-    var tr = document.createElementNS(NS,'text'); tr.setAttribute('x',xEnd); tr.setAttribute('y','135'); tr.setAttribute('text-anchor','end'); tr.setAttribute('font-weight','bold'); tr.setAttribute('fill','var(--accent)'); tr.textContent = strRes; svg.appendChild(tr);
-  }
-
-  function updateMultiplicationEngine() {
-    var f1 = parseFloat(Q('mul1').value) || 0, f2 = parseFloat(Q('mul2').value) || 0;
-    var prod = f1 * f2;
-    var s1 = f1.toString(), s2 = f2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var totalCasas = c1 + c2;
-    var svg = Q('svgMul'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg', xEnd = 160;
-    var t1 = document.createElementNS(NS,'text'); t1.setAttribute('x',xEnd); t1.setAttribute('y','40'); t1.setAttribute('text-anchor','end'); t1.textContent = s1; svg.appendChild(t1);
-    var t2 = document.createElementNS(NS,'text'); t2.setAttribute('x',xEnd); t2.setAttribute('y','80'); t2.setAttribute('text-anchor','end'); t2.textContent = '× '+s2; svg.appendChild(t2);
-    var ln = document.createElementNS(NS,'line'); ln.setAttribute('x1','50'); ln.setAttribute('y1','100'); ln.setAttribute('x2',xEnd+10); ln.setAttribute('y2','100'); ln.setAttribute('stroke','currentColor'); ln.setAttribute('stroke-width','2'); svg.appendChild(ln);
-    var tr = document.createElementNS(NS,'text'); tr.setAttribute('x',xEnd); tr.setAttribute('y','140'); tr.setAttribute('text-anchor','end'); tr.setAttribute('font-weight','bold'); tr.setAttribute('fill','#7A00FF'); tr.textContent = prod.toFixed(totalCasas); svg.appendChild(tr);
-    Q('decValue').textContent = f1.toString();
-    Q('fracNum').textContent = Math.round(f1 * 100);
-    Q('pctValue').textContent = Math.round(f1 * 100) + '%';
-  }
-
-  function updateDivisionEngine() {
-    var d1 = parseFloat(Q('div1').value) || 0, d2 = parseFloat(Q('div2').value) || 1;
-    if(d2 === 0) d2 = 1;
-    var s1 = d1.toString(), s2 = d2.toString();
-    var c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
-    var c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
-    var maxCasas = Math.max(c1, c2);
-    var fatorConversao = Math.pow(10, maxCasas);
-    var intDividendo = Math.round(d1 * fatorConversao), intDivisor = Math.round(d2 * fatorConversao);
-    var quociente = d1 / d2;
-    var dm = Q('divMethodText'); if(dm) dm.innerHTML = 'Ajuste pr\xe1tico (\xd7'+fatorConversao+'): <strong>'+intDividendo+' : '+intDivisor+'</strong>';
-    var svg = Q('svgDiv'); if(!svg) return;
-    svg.innerHTML = '';
-    var NS = 'http://www.w3.org/2000/svg';
-    var tD = document.createElementNS(NS,'text'); tD.setAttribute('x','30'); tD.setAttribute('y','40'); tD.textContent = intDividendo; svg.appendChild(tD);
-    var tDi = document.createElementNS(NS,'text'); tDi.setAttribute('x','140'); tDi.setAttribute('y','40'); tDi.textContent = intDivisor; svg.appendChild(tDi);
-    var vl = document.createElementNS(NS,'line'); vl.setAttribute('x1','125'); vl.setAttribute('y1','15'); vl.setAttribute('x2','125'); vl.setAttribute('y2','90'); vl.setAttribute('stroke','currentColor'); vl.setAttribute('stroke-width','2'); svg.appendChild(vl);
-    var hl = document.createElementNS(NS,'line'); hl.setAttribute('x1','125'); hl.setAttribute('y1','50'); hl.setAttribute('x2','220'); hl.setAttribute('y2','50'); hl.setAttribute('stroke','currentColor'); hl.setAttribute('stroke-width','2'); svg.appendChild(hl);
-    var tQ = document.createElementNS(NS,'text'); tQ.setAttribute('x','140'); tQ.setAttribute('y','80'); tQ.setAttribute('font-weight','bold'); tQ.setAttribute('fill','#FF0055'); tQ.textContent = Number(quociente.toFixed(3)); svg.appendChild(tQ);
-  }
-
-  function updateFractionEngine() {
-    var num = parseInt(Q('fNum').value) || 0, den = parseInt(Q('fDen').value) || 1;
-    if(den === 0) { Q('fracResult').textContent = 'Erro (Denom=0)'; Q('fracType').textContent = '-'; return; }
-    var res = num / den, resStr = res.toString();
-    Q('fracResult').textContent = resStr.length > 8 ? res.toFixed(5) + '...' : resStr;
-    var ft = Q('fracType'); if(!ft) return;
-    if(!resStr.includes('.')) { ft.textContent = 'Inteiro Exato'; ft.style.background='rgba(0,201,173,.15)'; ft.style.color='#00c9ad'; }
-    else { var dp = resStr.split('.')[1];
-      if(dp.length < 6) { ft.textContent='Decimal Exato'; ft.style.background='rgba(0,201,173,.15)'; ft.style.color='#00c9ad'; }
-      else { ft.textContent = num%2===0?'D\xedzima Peri\xf3dica Composta':'D\xedzima Peri\xf3dica Simples'; ft.style.background='rgba(255,159,28,.15)'; ft.style.color='#FF9F1C'; }
-    }
-  }
-
-  /* Orquestração idêntica ao gemini-code */
-  function ev(id, evt, fn){ var el=Q(id); if(el) el.addEventListener(evt, fn); }
-  ev('add1','input',updateAdditionEngine);
-  ev('add2','input',updateAdditionEngine);
-  ev('opSelect','change',updateAdditionEngine);
-  ev('mul1','input',updateMultiplicationEngine);
-  ev('mul2','input',updateMultiplicationEngine);
-  ev('div1','input',updateDivisionEngine);
-  ev('div2','input',updateDivisionEngine);
-  ev('fNum','input',updateFractionEngine);
-  ev('fDen','input',updateFractionEngine);
-  updateAdditionEngine();
-  updateMultiplicationEngine();
-  updateDivisionEngine();
-  updateFractionEngine();
-})();
-</script>`,
-    },
+`,
 
     'Frações': {
       title: 'Frações: tipos, operações e simplificação',
@@ -858,17 +742,11 @@ const EduContentModule = {
         ? content.content
         : (content.content || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
 
-      // CRÍTICO: <script> dentro de innerHTML NÃO executa automaticamente no browser.
-      // Precisa extrair e re-executar cada script manualmente.
-      bodyEl.querySelectorAll('script').forEach(oldScript => {
-        const newScript = document.createElement('script');
-        // Copia atributos (type, src…)
-        Array.from(oldScript.attributes).forEach(attr =>
-          newScript.setAttribute(attr.name, attr.value)
-        );
-        newScript.textContent = oldScript.textContent;
-        oldScript.parentNode.replaceChild(newScript, oldScript);
-      });
+      // Módulos interativos: JS externo no aprender.js em vez de inline no content
+      // Garante execução 100% após innerHTML estar no DOM
+      if (topic === 'Operações' && subject === 'matematica') {
+        MathSimulatorModule.init();
+      }
     }
 
     // Afiliado contextual
@@ -991,6 +869,249 @@ const HeaderModule = {
 /* ================================================================
    BUSCA DE SUBJECTS NA API
    ================================================================ */
+
+/* ================================================================
+   MATH SIMULATOR MODULE
+   Funções extraídas 1:1 do gemini-code.html.
+   CSS das classes .op-* está no aprender.css (não inline).
+   Chamado por EduContentModule.load() quando topic === 'Operações'.
+   ================================================================ */
+const MathSimulatorModule = {
+  init() {
+    // Atalhos auxiliares de manipulação do DOM
+    const query = el => document.querySelector(el);
+    
+    /* ====================================================================
+       REPRESENTADOR DE ADIÇÃO E SUBTRAÇÃO (VÍRGULA DEBAIXO DE VÍRGULA)
+       ==================================================================== */
+    function updateAdditionEngine() {
+      const v1 = parseFloat(query('#add1').value) || 0;
+      const v2 = parseFloat(parseFloat(query('#add2').value) || 0);
+      const op = query('#opSelect').value;
+      const res = op === '+' ? v1 + v2 : v1 - v2;
+    
+      // Descobre o número máximo de casas decimais para forçar alinhamento
+      const s1 = v1.toString();
+      const s2 = v2.toString();
+      const c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+      const c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+      const maxCasas = Math.max(c1, c2);
+    
+      // Formata strings forçando os zeros à direita
+      const str1 = v1.toFixed(maxCasas);
+      const str2 = v2.toFixed(maxCasas);
+      const strRes = res.toFixed(maxCasas);
+    
+      const svg = query('#svgAdd');
+      svg.innerHTML = '';
+    
+      // Renderiza linhas no SVG alinhando caracteres de trás para frente
+      const xEnd = 160;
+      
+      // Linha 1
+      let t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t1.setAttribute("x", xEnd);
+      t1.setAttribute("y", "40");
+      t1.setAttribute("text-anchor", "end");
+      t1.textContent = str1;
+      svg.appendChild(t1);
+    
+      // Linha 2
+      let t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t2.setAttribute("x", xEnd);
+      t2.setAttribute("y", "80");
+      t2.setAttribute("text-anchor", "end");
+      t2.textContent = op + " " + str2;
+      svg.appendChild(t2);
+    
+      // Traço Horizontal da Conta
+      let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", "40");
+      line.setAttribute("y1", "100");
+      line.setAttribute("x2", xEnd + 10);
+      line.setAttribute("y2", "100");
+      line.setAttribute("stroke", "var(--text)");
+      line.setAttribute("stroke-width", "2");
+      svg.appendChild(line);
+    
+      // Resultado
+      let tRes = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tRes.setAttribute("x", xEnd);
+      tRes.setAttribute("y", "135");
+      tRes.setAttribute("text-anchor", "end");
+      tRes.setAttribute("font-weight", "bold");
+      tRes.setAttribute("fill", "var(--accent)");
+      tRes.textContent = strRes;
+      svg.appendChild(tRes);
+    }
+    
+    /* ====================================================================
+       REPRESENTADOR DE MULTIPLICAÇÃO
+       ==================================================================== */
+    function updateMultiplicationEngine() {
+      const f1 = parseFloat(query('#mul1').value) || 0;
+      const f2 = parseFloat(query('#mul2').value) || 0;
+      const prod = f1 * f2;
+    
+      const s1 = f1.toString();
+      const s2 = f2.toString();
+      const c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+      const c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+      const totalCasas = c1 + c2;
+    
+      const svg = query('#svgMul');
+      svg.innerHTML = '';
+      const xEnd = 160;
+    
+      // Mostra fatores estruturados
+      let t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t1.setAttribute("x", xEnd); t1.setAttribute("y", "40"); t1.setAttribute("text-anchor", "end");
+      t1.textContent = s1;
+      svg.appendChild(t1);
+    
+      let t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t2.setAttribute("x", xEnd); t2.setAttribute("y", "80"); t2.setAttribute("text-anchor", "end");
+      t2.textContent = "× " + s2;
+      svg.appendChild(t2);
+    
+      let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", "50"); line.setAttribute("y1", "100"); line.setAttribute("x2", xEnd + 10); line.setAttribute("y2", "100");
+      line.setAttribute("stroke", "var(--text)"); line.setAttribute("stroke-width", "2");
+      svg.appendChild(line);
+    
+      let tRes = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tRes.setAttribute("x", xEnd); tRes.setAttribute("y", "140"); tRes.setAttribute("text-anchor", "end");
+      tRes.setAttribute("font-weight", "bold"); tRes.setAttribute("fill", "var(--accent)");
+      tRes.textContent = prod.toFixed(totalCasas);
+      svg.appendChild(tRes);
+    
+      // Sincroniza a caixa de porcentagem secundária
+      query('#decValue').textContent = f1.toString();
+      query('#fracNum').textContent = Math.round(f1 * 100);
+      query('#pctValue').textContent = Math.round(f1 * 100) + "%";
+    }
+    
+    /* ====================================================================
+       REPRESENTADOR DE DIVISÃO (MÉTODO PRÁTICO DOS CORTES DE VÍRGULA)
+       ==================================================================== */
+    function updateDivisionEngine() {
+      const d1 = parseFloat(query('#div1').value) || 0;
+      const d2 = parseFloat(query('#div2').value) || 1;
+      
+      const s1 = d1.toString();
+      const s2 = d2.toString();
+      const c1 = s1.includes('.') ? s1.split('.')[1].length : 0;
+      const c2 = s2.includes('.') ? s2.split('.')[1].length : 0;
+      const maxCasas = Math.max(c1, c2);
+    
+      // Multiplica por potências de 10 para simular a remoção da vírgula
+      const fatorConversao = Math.pow(10, maxCasas);
+      const intDividendo = Math.round(d1 * fatorConversao);
+      const intDivisor = Math.round(d2 * fatorConversao);
+      const quociente = d1 / d2;
+    
+      query('#divMethodText').innerHTML = `Ajuste prático (×${fatorConversao}): <strong>${intDividendo} : ${intDivisor}</strong>`;
+    
+      const svg = query('#svgDiv');
+      svg.innerHTML = '';
+    
+      // Desenha o formato clássico de chave de divisão (L-Shape)
+      // Dividendo
+      let tDiv = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tDiv.setAttribute("x", "30"); tDiv.setAttribute("y", "40");
+      tDiv.textContent = intDividendo;
+      svg.appendChild(tDiv);
+    
+      // Divisor
+      let tDis = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tDis.setAttribute("x", "140"); tDis.setAttribute("y", "40");
+      tDis.textContent = intDivisor;
+      svg.appendChild(tDis);
+    
+      // Linha Vertical da Chave
+      let vLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      vLine.setAttribute("x1", "125"); vLine.setAttribute("y1", "15");
+      vLine.setAttribute("x2", "125"); vLine.setAttribute("y2", "90");
+      vLine.setAttribute("stroke", "var(--text)"); vLine.setAttribute("stroke-width", "2");
+      svg.appendChild(vLine);
+    
+      // Linha Horizontal da Chave
+      let hLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      hLine.setAttribute("x1", "125"); hLine.setAttribute("y1", "50");
+      hLine.setAttribute("x2", "220"); hLine.setAttribute("y2", "50");
+      hLine.setAttribute("stroke", "var(--text)"); hLine.setAttribute("stroke-width", "2");
+      svg.appendChild(hLine);
+    
+      // Quociente Final Calculado
+      let tQuo = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tQuo.setAttribute("x", "140"); tQuo.setAttribute("y", "80");
+      tQuo.setAttribute("font-weight", "bold"); tQuo.setAttribute("fill", "var(--accent)");
+      tQuo.textContent = Number(quociente.toFixed(3));
+      svg.appendChild(tQuo);
+    }
+    
+    /* ====================================================================
+       CONVERSOR DE FRAÇÕES ORDINÁRIAS PARA DÍZIMAS E DECIMAIS
+       ==================================================================== */
+    function updateFractionEngine() {
+      const num = parseInt(query('#fNum').value) || 0;
+      const den = parseInt(query('#fDen').value) || 1;
+    
+      if(den === 0) {
+        query('#fracResult').textContent = "Erro (Denom = 0)";
+        query('#fracType').textContent = "-";
+        return;
+      }
+    
+      const res = num / den;
+      const resStr = res.toString();
+    
+      query('#fracResult').textContent = resStr.length > 8 ? res.toFixed(5) + "..." : resStr;
+    
+      // Identifica o tipo de decimal de forma simplificada para o estudante
+      if (!resStr.includes('.')) {
+        query('#fracType').textContent = "Inteiro Exato";
+      } else {
+        const decimalPart = resStr.split('.')[1];
+        if (decimalPart.length < 6) {
+          query('#fracType').textContent = "Decimal Exato";
+        } else {
+          query('#fracType').textContent = num % 2 === 0 ? "Dízima Periódica Composta" : "Dízima Periódica Simples";
+        }
+      }
+    }
+    
+    /* ====================================================================
+       ORQUESTRAÇÃO DE EVENTOS (STARTUP)
+       ==================================================================== */
+
+    // Registra eventos e faz render inicial
+    // Inputs Adição/Subtração
+    query('#add1').addEventListener('input', updateAdditionEngine);
+    query('#add2').addEventListener('input', updateAdditionEngine);
+    query('#opSelect').addEventListener('change', updateAdditionEngine);
+    
+    // Inputs Multiplicação
+    query('#mul1').addEventListener('input', updateMultiplicationEngine);
+    query('#mul2').addEventListener('input', updateMultiplicationEngine);
+    
+    // Inputs Divisão
+    query('#div1').addEventListener('input', updateDivisionEngine);
+    query('#div2').addEventListener('input', updateDivisionEngine);
+    
+    // Inputs Frações
+    query('#fNum').addEventListener('input', updateFractionEngine);
+    query('#fDen').addEventListener('input', updateFractionEngine);
+    
+    // Executa a primeira renderização dos mocks dinâmicos
+    updateAdditionEngine();
+    updateMultiplicationEngine();
+    updateDivisionEngine();
+    updateFractionEngine();
+    
+  },
+};
+
 async function fetchEduSubjects() {
   try {
     const res = await fetch('/api/subjects?category=aprender');
